@@ -1,0 +1,3 @@
+[alias]
+dev = ["make", "dev"]
+"run:tests" = ["test", "--", "--test-threads=1"]

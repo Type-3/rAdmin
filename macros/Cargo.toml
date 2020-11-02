@@ -1,0 +1,13 @@
+[package]
+name = "radmin-macros"
+version = "0.1.0"
+authors = ["Bytebuddha <pmg41494@protonmail.com>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1"
+quote = "1"
+case = "*"

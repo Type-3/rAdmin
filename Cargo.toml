@@ -1,0 +1,38 @@
+[package]
+name = "radmin"
+version = "0.1.0"
+authors = ["Bytebuddha <pmg41494@protonmail.com>"]
+edition = "2018"
+
+[workspace]
+members = [
+    "macros",
+    "examples/minimal"
+]
+
+[dependencies]
+uuid = { version = "^0.8", features = ["serde", "v4"] }
+rand = "0.7.3"
+serde = "^1.0"
+clap = "^2.33"
+rocket = "^0.4"
+bcrypt = "0.8.2"
+dotenv = "^0.15"
+serde_json = "^1"
+paginator = "0.2.0"
+validator = "^0.11"
+rust-argon2 = "0.8.2"
+typed-builder = "^0.7"
+derive_more = "^0.99"
+diesel-factories = "1.0.1"
+diesel_migrations = "^1.4"
+validator_derive = "^0.11"
+radmin-macros = { path = "macros" }
+chrono = { version = "0.4.15", features = ["serde"] }
+fake = { version = "2.2.3", features = ["derive", "chrono"] }
+cli-table = { git = "https://github.com/devashishdxt/cli-table" }
+diesel = { version = "^1.4", features = ["postgres", "uuidv07", "chrono"] }
+
+[dependencies.rocket_contrib]
+version = "^0.4"
+features = ["diesel_postgres_pool", "uuid", "json"]
