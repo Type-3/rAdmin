@@ -35,6 +35,7 @@ fn simple_success() {
                 "name": "new_role",
                 "label": "label",
                 "description": "description",
+                "is_super": false,
                 "permissions": []
             })
             .to_string(),

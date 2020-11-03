@@ -15,7 +15,7 @@ mod auth;
 pub use self::auth::Auth;
 
 mod seeder;
-pub use self::seeder::{run_init_seeders, ServerSeeder};
+pub use self::seeder::AclSeeder;
 
 pub struct AclModule;
 

@@ -1,0 +1,9 @@
+[
+  {
+    "name": "admin",
+    "label": "Admin",
+    "is_super": true,
+    "permissions": [],
+    "description": "Admin users can modify anything in the app."
+  }
+]

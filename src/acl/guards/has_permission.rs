@@ -5,7 +5,7 @@ use rocket::Outcome;
 use std::marker::PhantomData;
 
 use super::AuthorizedAccount;
-use crate::acl::traits::HasPermissions;
+use crate::acl::traits::{HasPermissions, HasRoles};
 use crate::permissions::PermissionDef;
 use crate::DbConnection;
 
@@ -23,7 +23,8 @@ impl<'a, 'r, T: PermissionDef> FromRequest<'a, 'r> for HasPermission<T> {
         let db = request.guard::<DbConnection>()?.0;
         if account
             .has_permission_name(T::NAME, &db)
-            .map_err(|_| Err((Status::Unauthorized, ())))?
+            .map_err(|_| Err((Status::Unauthorized, ())))? ||
+          account.is_super_role(&db).map_err(|_| Err((Status::InternalServerError, ())))?
         {
             Outcome::Success(HasPermission {
                 _phantom: Default::default(),

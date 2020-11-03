@@ -15,6 +15,7 @@ pub struct RoleFactory {
     pub label: Option<String>,
     #[dummy("Sentence()")]
     pub description: Option<String>,
+    pub is_super: bool
 }
 
 impl RoleFactory {
@@ -25,6 +26,8 @@ impl RoleFactory {
 
 impl Default for RoleFactory {
     fn default() -> RoleFactory {
-        Faker.fake()
+        let mut factory: RoleFactory = Faker.fake();
+        factory.is_super = false;
+        factory
     }
 }

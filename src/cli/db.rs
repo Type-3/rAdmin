@@ -85,14 +85,18 @@ impl<'a> Database<'a> {
 
     fn handle_seed_command(&self, matches: Option<&ArgMatches>) -> Result<(), ServerError> {
         let conn = crate::database::establish_connection()?;
-        crate::acl::run_init_seeders(&conn, matches)?;
         for module in &self.0.modules.0 {
             println!(
                 "Running {}({}) seeder",
                 module.identifier(),
                 module.version()
             );
-            (*module).database().seeder().seed(matches, &conn)?;
+            match (*module).database().seeder().seed(matches, &conn) {
+                Ok(_) => {},
+                Err(err) => {
+                    println!("{}({}): {:?}", module.identifier(), module.version(), err);
+                }
+            }
         }
         Ok(())
     }

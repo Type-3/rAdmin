@@ -16,6 +16,7 @@ pub struct Role {
     pub name: String,
     pub label: Option<String>,
     pub description: Option<String>,
+    pub is_super: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -150,6 +151,7 @@ impl Into<Vec<Cell>> for Role {
         vec![
             Cell::new(&self.id, Default::default()),
             Cell::new(&self.name, Default::default()),
+            Cell::new(&self.is_super, Default::default()),
             Cell::new(&label, Default::default()),
             Cell::new(&description, Default::default()),
         ]

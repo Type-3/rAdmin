@@ -1,6 +1,6 @@
 use diesel::PgConnection;
 
-use super::ServerSeeder;
+use super::AclSeeder;
 use crate::controllers::SearchConfig;
 use crate::modules::DatabaseModule;
 use crate::modules::Seeder;
@@ -10,7 +10,7 @@ pub struct AclDbMod;
 
 impl DatabaseModule for AclDbMod {
     fn seeder(&self) -> Box<dyn Seeder> {
-        Box::new(ServerSeeder)
+        Box::new(AclSeeder)
     }
     /// The migrations for the Acl are located with the "Server" migrations and are run
     /// automatically.

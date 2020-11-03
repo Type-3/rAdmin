@@ -15,6 +15,7 @@ pub struct RoleCreateForm {
     pub label: Option<String>,
     pub description: Option<String>,
     pub permissions: Vec<Uuid>,
+    pub is_super: bool
 }
 
 impl Submitable for RoleCreateForm {
@@ -23,6 +24,7 @@ impl Submitable for RoleCreateForm {
             .name(self.name)
             .label(self.label)
             .description(self.description)
+            .is_super(self.is_super)
             .insert(&conn);
         role.sync_permissions(&self.permissions, conn)?;
         Ok(())

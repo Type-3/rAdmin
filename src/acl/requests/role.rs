@@ -28,6 +28,7 @@ pub struct RoleRequest {
     )]
     pub description: Option<String>,
     pub permissions: Vec<Uuid>,
+    pub is_super: bool
 }
 
 impl Validatable for RoleRequest {
@@ -42,6 +43,7 @@ impl Fillable<Role> for RoleRequest {
         role.name = self.name;
         role.label = self.label;
         role.description = self.description;
+        role.is_super = self.is_super;
         role.sync_permissions(&self.permissions, conn)?;
         Ok(())
     }

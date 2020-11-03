@@ -16,6 +16,7 @@ pub trait HasRoles {
     fn has_role_name(&self, role: &str, conn: &PgConnection) -> Result<bool, ServerError>;
     fn revoke_role_id(&self, role: Uuid, conn: &PgConnection) -> Result<(), ServerError>;
     fn revoke_role_name(&self, role: &str, conn: &PgConnection) -> Result<(), ServerError>;
+    fn is_super_role(&self, conn: &PgConnection) -> Result<bool, ServerError>;
 
     fn assign_role(&self, role: &Role, conn: &PgConnection) -> Result<(), ServerError> {
         self.assign_role_id(role.id, conn)

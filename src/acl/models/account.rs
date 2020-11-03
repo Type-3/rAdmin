@@ -189,6 +189,16 @@ impl Into<Vec<Cell>> for Account {
 }
 
 impl HasRoles for Account {
+
+    fn is_super_role(&self, conn: &PgConnection) -> Result<bool, ServerError> {
+        for role in self.roles(conn)? {
+            if role.is_super {
+                return Ok(true);
+            }
+        }
+        return Ok(false);
+    }
+
     fn roles(&self, conn: &PgConnection) -> Result<Vec<Role>, ServerError> {
         let account_id = account_roles::account_id.eq(self.id);
         Ok(account_roles::table

@@ -51,6 +51,7 @@ table! {
         name -> Varchar,
         label -> Nullable<Varchar>,
         description -> Nullable<Text>,
+        is_super -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
