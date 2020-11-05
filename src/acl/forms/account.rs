@@ -38,6 +38,7 @@ impl AccountCreateForm {
 impl Submitable for AccountCreateForm {
     fn submit(self, conn: &PgConnection) -> Result<(), ServerError> {
         let account = AccountFactory::default()
+            .email(self.email)
             .username(self.username)
             .set_password_with_hash(self.pw_type, &self.password)?
             .insert(conn);

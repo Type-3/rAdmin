@@ -3,6 +3,7 @@ use rocket::{self, post, Config, State};
 use rocket_contrib::json::Json;
 use serde_json::json;
 
+use crate::ServerError;
 use crate::acl::guards::Unauthenticated;
 use crate::acl::models::Account;
 use crate::acl::schema::accounts::dsl::*;
@@ -20,20 +21,17 @@ pub fn login(
     account_in: Json<crate::acl::requests::LoginRequest>,
     _app_config: State<Config>,
     db: DbConnection,
-) -> Result<ApiResponse, ApiResponse> {
-    account_in
-        .validate()
-        .map_err(|_| ApiResponse::internal_server_error())?;
+) -> Result<ApiResponse, ServerError> {
+    account_in.validate()?;
 
     let mut account = accounts
         .filter(username.eq(&account_in.username))
         .or_filter(email.eq(&account_in.username))
         .first::<Account>(&*db)
-        .optional()?
-        .ok_or_else(|| {
+        .or_else(|_| {
             // Hash password here to prevent a timing attack.
             Auth::hash_nonsense(None).unwrap();
-            ApiResponse::unauthorized().message("Username or password incorrect.")
+            Err(ServerError::Diesel(diesel::result::Error::NotFound))
         })?;
 
     if !Auth::perform_login(&mut account, &account_in.password, db.as_ref())? {

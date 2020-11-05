@@ -1,6 +1,6 @@
 use clap::{Arg, ArgMatches};
-use diesel::PgConnection;
-
+use diesel::{PgConnection, ExpressionMethods, QueryDsl, RunQueryDsl};
+use serde_json::{Value, Map, json};
 use crate::acl::factories::PermissionFactory;
 use crate::traits::Submitable;
 use crate::modules::Seeder;
@@ -63,7 +63,7 @@ impl Seeder for AclSeeder {
 
     fn seed(&self, _matches: Option<&ArgMatches>, conn: &PgConnection) -> Result<(), ServerError> {
         use std::fs::File;
-        use crate::acl::forms::{RoleCreateForm, PermissionCreateForm};
+        use crate::acl::forms::{RoleCreateForm, PermissionCreateForm, AccountCreateForm};
         insert_default_permissions(conn)?;
 
         if let Ok(file) = File::open("seeds/roles.json") {
@@ -76,6 +76,35 @@ impl Seeder for AclSeeder {
             let permissions: Vec<PermissionCreateForm> = serde_json::from_reader(file)?;
             for permission in permissions {
                 permission.submit(conn)?;
+            }
+        }
+        if let Ok(file) = File::open("seeds/accounts.json") {
+            use crate::acl::schema::roles;
+            let accounts: Vec<Map<String, Value>> = serde_json::from_reader(file)?;
+            for mut account in accounts.into_iter() {
+                if account.contains_key("roles") {
+                    account["roles"] = json!(account.get("roles")
+                                              .expect("Json does not contain the `roles` field")
+                                              .as_array()
+                                              .expect("`roles` field is not JSON array")
+                                              .iter()
+                                              .map(|item| {
+                        roles::table.select(roles::id)
+                            .filter(roles::name.eq(item.as_str().unwrap()))
+                            .first::<uuid::Uuid>(conn)
+                            .expect(&format!("Role named `{}` does not exists", item.as_str().unwrap()))
+                    })
+                    .collect::<Vec<uuid::Uuid>>());
+                }
+                account.insert("password_confirm".into(), account["password"].clone());
+                if !account.contains_key("roles") {
+                    account.insert("roles".into(), json!(Vec::<Value>::new()));
+                }
+                if !account.contains_key("permissions") {
+                    account.insert("permissions".into(), json!(Vec::<Value>::new()));
+                }
+                let account: AccountCreateForm = serde_json::from_value(json!(account))?;
+                account.submit(conn)?;
             }
         }
         Ok(())

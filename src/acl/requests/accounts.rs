@@ -42,6 +42,7 @@ impl Validatable for AccountRequest {
 impl Fillable<Account> for AccountRequest {
     fn fill(self, account: &mut Account, conn: &PgConnection) -> Result<(), ServerError> {
         let config = crate::config::get_rocket_config(None)?;
+        account.email = self.email;
         account.username = self.username;
         account.password_salt = Auth::generate_salt();
         if let Some(pass) = self.password {
