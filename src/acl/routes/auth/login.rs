@@ -40,6 +40,7 @@ pub fn login(
     let response = json!({
         "id": account.id,
         "token": account.auth_token.as_ref().unwrap().clone(),
+        "email": &account.email,
         "username": &account.username,
         "permissions": account.permission_names(db.as_ref())?,
         "roles": account.role_names(db.as_ref())?
