@@ -41,6 +41,7 @@ pub fn login(
         "id": account.id,
         "token": account.auth_token.as_ref().unwrap().clone(),
         "email": &account.email,
+        "avatar": &account.avatar,
         "username": &account.username,
         "permissions": account.permission_names(db.as_ref())?,
         "roles": account.role_names(db.as_ref())?

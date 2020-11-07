@@ -24,6 +24,7 @@ pub struct Account {
     #[serde(skip)]
     pub auth_token: Option<String>,
     pub email_verified_at: Option<NaiveDateTime>,
+    pub avatar: Option<Uuid>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

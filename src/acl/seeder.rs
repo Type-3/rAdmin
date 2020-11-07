@@ -5,6 +5,9 @@ use crate::acl::factories::PermissionFactory;
 use crate::traits::Submitable;
 use crate::modules::Seeder;
 use crate::ServerError;
+use uuid::Uuid;
+
+use std::path::PathBuf;
 
 const SERVER_PERMISSIONS: &[(&str, &str, &str)] = &[
     (
@@ -102,6 +105,19 @@ impl Seeder for AclSeeder {
                 }
                 if !account.contains_key("permissions") {
                     account.insert("permissions".into(), json!(Vec::<Value>::new()));
+                }
+                if account.contains_key("avatar") {
+                    let mut seed_path = PathBuf::from("seeds/avatars/");
+                    let mut out_path = PathBuf::from("data/avatars/");
+                    let _avatar = account.remove("avatar").unwrap();
+                    let avatar = _avatar.as_str().unwrap();
+                    seed_path.push(&avatar);
+                    if seed_path.exists() {
+                        let id = Uuid::new_v4();
+                        out_path.push(format!("{}.png", id));
+                        std::fs::copy(&seed_path, &out_path)?;
+                        account.insert("avatar".into(), json!(id));
+                    }
                 }
                 let account: AccountCreateForm = serde_json::from_value(json!(account))?;
                 account.submit(conn)?;

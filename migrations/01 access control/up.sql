@@ -10,6 +10,7 @@ CREATE TABLE accounts (
   password_salt BYTEA NOT NULL,
   auth_token VARCHAR,
   email_verified_at TIMESTAMP,
+  avatar UUID,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

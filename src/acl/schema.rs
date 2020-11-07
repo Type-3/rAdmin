@@ -22,6 +22,7 @@ table! {
         password_salt -> Bytea,
         auth_token -> Nullable<Varchar>,
         email_verified_at -> Nullable<Timestamp>,
+        avatar -> Nullable<Uuid>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

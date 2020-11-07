@@ -30,6 +30,7 @@ pub struct AccountRequest {
     pub password_confirm: Option<String>,
     pub roles: Vec<Uuid>,
     pub permissions: Vec<Uuid>,
+    pub avatar: Option<Uuid>
 }
 
 impl Validatable for AccountRequest {
@@ -45,6 +46,7 @@ impl Fillable<Account> for AccountRequest {
         account.email = self.email;
         account.username = self.username;
         account.password_salt = Auth::generate_salt();
+        account.avatar = self.avatar;
         if let Some(pass) = self.password {
             account.password_hash = Auth::hash_password(
                 &pass,
