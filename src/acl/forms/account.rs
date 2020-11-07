@@ -44,6 +44,7 @@ impl Submitable for AccountCreateForm {
             .email(self.email)
             .username(self.username)
             .set_password_with_hash(self.pw_type, &self.password)?
+            .avatar(self.avatar)
             .insert(conn);
         account.avatar = self.avatar;
         account.save_changes::<Account>(conn)?;

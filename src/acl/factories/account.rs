@@ -2,7 +2,7 @@ use chrono::NaiveDateTime;
 use diesel::PgConnection;
 use diesel_factories::Factory;
 use fake::faker::internet::en::{SafeEmail, Username};
-use fake::{Dummy, Fake, Faker};
+use fake::Fake;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -11,18 +11,16 @@ use crate::acl::Auth;
 use crate::types::PasswordType;
 use crate::ServerError;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Factory, Dummy)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Factory)]
 #[factory(model = "Account", table = "crate::acl::schema::accounts", id = "Uuid")]
 pub struct AccountFactory {
-    #[dummy(faker = "SafeEmail()")]
     pub email: String,
-    #[dummy("")]
     pub email_verified_at: Option<NaiveDateTime>,
-    #[dummy(faker = "Username()")]
     pub username: String,
     pub password_type: PasswordType,
     pub password_hash: Vec<u8>,
     pub password_salt: Vec<u8>,
+    pub avatar: Option<Uuid>
 }
 
 impl AccountFactory {
@@ -48,6 +46,14 @@ impl AccountFactory {
 
 impl Default for AccountFactory {
     fn default() -> AccountFactory {
-        Faker.fake()
+        AccountFactory {
+            email: SafeEmail().fake(),
+            email_verified_at: None,
+            username: Username().fake(),
+            password_type: PasswordType::Argon2,
+            password_hash: vec![],
+            password_salt: vec![],
+            avatar: None
+        }
     }
 }
