@@ -1,14 +1,22 @@
 use clap::{App, ArgMatches};
 
-use super::Database;
+use super::{Database, Storage};
 use crate::modules::CliModule;
 use crate::ServerError;
 
-pub struct CliApp<'a>(&'a crate::Application, Database<'a>);
+pub struct CliApp<'a> {
+    app: &'a crate::Application,
+    database: Database<'a>,
+    storage: Storage<'a>
+}
 
 impl<'a> CliApp<'a> {
     pub fn new(app: &'a crate::Application) -> CliApp<'a> {
-        CliApp(&app, Database::new(&app))
+        CliApp {
+            app: &app,
+            database: Database::new(&app),
+            storage: Storage::new(&app)
+        }
     }
 }
 
@@ -18,12 +26,13 @@ impl<'a> CliModule for CliApp<'a> {
     }
 
     fn app(&self) -> Option<App<'static, 'static>> {
-        let mut app = App::new(self.0.name)
-            .version(self.0.version)
-            .about(self.0.description)
-            .author(self.0.author)
-            .subcommand(self.1.app().unwrap());
-        for module in &self.0.modules.0 {
+        let mut app = App::new(self.app.name)
+            .version(self.app.version)
+            .about(self.app.description)
+            .author(self.app.author)
+            .subcommand(self.storage.app().unwrap())
+            .subcommand(self.database.app().unwrap());
+        for module in &self.app.modules.0 {
             if let Some(cmd) = module.cli().app() {
                 app = app.subcommand(cmd);
             }
@@ -35,15 +44,17 @@ impl<'a> CliModule for CliApp<'a> {
         dotenv::dotenv().unwrap();
         let matches = matches.unwrap();
         if matches.subcommand.is_none() {
-            Err(crate::rocket_factory(None, &self.0.modules)?
+            Err(crate::rocket_factory(None, &self.app.modules)?
                 .launch()
                 .into())
         } else {
             let (cmd, matches) = matches.subcommand();
-            if cmd == self.1.arg().unwrap() {
-                self.1.handle(matches)?;
+            if cmd == self.database.arg().unwrap() {
+                self.database.handle(matches)?;
+            } else if cmd == self.storage.arg().unwrap() {
+                self.storage.handle(matches)?;
             }
-            for module in &self.0.modules.0 {
+            for module in &self.app.modules.0 {
                 let cli = (*module).cli();
                 if let Some(arg) = cli.arg() {
                     if arg == cmd {

@@ -8,6 +8,7 @@ pub trait ServerModule {
     fn config(&self, config: rocket::Config) -> rocket::Config {
         config
     }
+    fn storage(&self) -> Vec<(&'static str, Vec<&'static str>)> { vec![] }
     fn cli(&self) -> Box<dyn CliModule> {
         Box::new(NullCliModule)
     }

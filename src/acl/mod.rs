@@ -28,6 +28,10 @@ impl crate::modules::ServerModule for AclModule {
         clap::crate_version!()
     }
 
+    fn storage(&self) -> Vec<(&'static str, Vec<&'static str>)> {
+        vec![("avatars", vec!["png"])]
+    }
+
     fn cli(&self) -> Box<dyn crate::modules::CliModule> {
         Box::new(cli::AclCli)
     }
