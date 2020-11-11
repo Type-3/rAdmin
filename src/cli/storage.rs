@@ -47,9 +47,11 @@ impl<'a> Storage<'a> {
                     for entry in files {
                         let entry = entry?;
                         let entry_path = entry.path();
-                        let ext = entry_path.extension().map(|item|item.to_str().unwrap());
-                        if extension.contains(&ext.unwrap()) {
-                            std::fs::remove_file(entry.path())?;
+                        let ext = entry_path.extension().map(|item| item.to_str().unwrap());
+                        if let Some(ext) = ext {
+                            if extension.contains(&ext) {
+                                std::fs::remove_file(entry.path())?;
+                            }
                         }
                     }
                 }
