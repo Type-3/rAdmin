@@ -21,10 +21,10 @@ table! {
         password_hash -> Bytea,
         password_salt -> Bytea,
         auth_token -> Nullable<Varchar>,
-        email_verified_at -> Nullable<Timestamp>,
+        email_verified_at -> Nullable<Timestamptz>,
         avatar -> Nullable<Uuid>,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
     }
 }
 
@@ -34,8 +34,8 @@ table! {
         name -> Varchar,
         label -> Nullable<Varchar>,
         description -> Nullable<Text>,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
     }
 }
 
@@ -53,8 +53,8 @@ table! {
         label -> Nullable<Varchar>,
         description -> Nullable<Text>,
         is_super -> Bool,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
     }
 }
 

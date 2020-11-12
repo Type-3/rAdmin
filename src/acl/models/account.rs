@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -23,10 +23,10 @@ pub struct Account {
     pub password_salt: Vec<u8>,
     #[serde(skip)]
     pub auth_token: Option<String>,
-    pub email_verified_at: Option<NaiveDateTime>,
+    pub email_verified_at: Option<DateTime<Utc>>,
     pub avatar: Option<Uuid>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 impl HasPermissions for Account {
@@ -92,6 +92,17 @@ impl HasPermissions for Account {
         Ok(())
     }
 
+    fn assign_permission_ids(
+        &self,
+        permissions: &[Uuid],
+        conn: &PgConnection,
+    ) -> Result<(), ServerError> {
+        for permission in permissions {
+            self.assign_permission_id(*permission, conn)?;
+        }
+        Ok(())
+    }
+
     fn assign_permission_name(
         &self,
         permission: &str,
@@ -102,17 +113,6 @@ impl HasPermissions for Account {
             .select(permissions::id)
             .first(conn)?;
         self.assign_permission_id(permission, conn)
-    }
-
-    fn assign_permission_ids(
-        &self,
-        permissions: &[Uuid],
-        conn: &PgConnection,
-    ) -> Result<(), ServerError> {
-        for permission in permissions {
-            self.assign_permission_id(*permission, conn)?;
-        }
-        Ok(())
     }
 
     fn sync_permissions(
@@ -190,16 +190,6 @@ impl Into<Vec<Cell>> for Account {
 }
 
 impl HasRoles for Account {
-
-    fn is_super_role(&self, conn: &PgConnection) -> Result<bool, ServerError> {
-        for role in self.roles(conn)? {
-            if role.is_super {
-                return Ok(true);
-            }
-        }
-        return Ok(false);
-    }
-
     fn roles(&self, conn: &PgConnection) -> Result<Vec<Role>, ServerError> {
         let account_id = account_roles::account_id.eq(self.id);
         Ok(account_roles::table
@@ -276,6 +266,7 @@ impl HasRoles for Account {
             .first(conn)?;
         self.has_role_id(role, conn)
     }
+
     fn revoke_role_id(&self, role: Uuid, conn: &PgConnection) -> Result<(), ServerError> {
         let role_id = account_roles::role_id.eq(role);
         let account_id = account_roles::account_id.eq(self.id);
@@ -283,7 +274,6 @@ impl HasRoles for Account {
         diesel::delete(statement).execute(conn)?;
         Ok(())
     }
-
     fn revoke_role_name(&self, name: &str, conn: &PgConnection) -> Result<(), ServerError> {
         let role: Uuid = roles::table
             .filter(roles::name.eq(name))
@@ -294,5 +284,14 @@ impl HasRoles for Account {
         let statement = account_roles::table.filter(role_id).filter(account_id);
         diesel::delete(statement).execute(conn)?;
         Ok(())
+    }
+
+    fn is_super_role(&self, conn: &PgConnection) -> Result<bool, ServerError> {
+        for role in self.roles(conn)? {
+            if role.is_super {
+                return Ok(true);
+            }
+        }
+        return Ok(false);
     }
 }
