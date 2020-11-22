@@ -1,4 +1,3 @@
-use chrono::NaiveDateTime;
 use diesel::{PgConnection, RunQueryDsl};
 use fake::faker::internet::en::{SafeEmail, Username};
 use fake::Fake;
@@ -15,7 +14,6 @@ use crate::ServerError;
 #[table_name = "accounts"]
 pub struct AccountFactory {
     pub email: String,
-    pub email_verified_at: Option<NaiveDateTime>,
     pub username: String,
     pub password_type: PasswordType,
     pub password_hash: Vec<u8>,
@@ -27,11 +25,6 @@ pub struct AccountFactory {
 impl AccountFactory {
     pub fn email<S: Into<String>>(mut self, email: S) -> AccountFactory {
         self.email = email.into();
-        self
-    }
-
-    pub fn email_verified_at(mut self, date: NaiveDateTime) -> AccountFactory {
-        self.email_verified_at = Some(date);
         self
     }
 
@@ -77,7 +70,6 @@ impl Default for AccountFactory {
     fn default() -> AccountFactory {
         AccountFactory {
             email: SafeEmail().fake(),
-            email_verified_at: None,
             username: Username().fake(),
             password_type: PasswordType::Argon2,
             password_hash: vec![],

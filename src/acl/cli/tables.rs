@@ -1,5 +1,5 @@
-use crate::cli::Table;
 use crate::acl::models::{Account, Role};
+use crate::cli::Table;
 
 #[derive(Default)]
 pub struct AccountsTable;
