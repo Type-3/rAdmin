@@ -18,22 +18,12 @@ impl AsRef<PgConnection> for DbConnection {
     }
 }
 
-use diesel::sql_types::{Array, Nullable, Text, Uuid};
 use diesel::*;
 
 no_arg_sql_function!(
     radmin_reset_database,
     (),
     "Represents the SQL radmin_reset_database() function"
-);
-
-sql_function!(
-    #[aggregate]
-    fn radmin_global_search(
-        needle: Text,
-        tables: Nullable<Array<Text>>,
-        schema: Nullable<Text>
-    ) -> Record<(Text, Text, Text, Uuid, Text)>
 );
 
 pub fn establish_connection() -> Result<PgConnection, ServerError> {

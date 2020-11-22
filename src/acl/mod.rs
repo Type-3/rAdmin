@@ -6,7 +6,6 @@ pub mod models;
 pub mod requests;
 pub mod routes;
 pub mod schema;
-pub mod traits;
 
 mod db;
 pub use self::db::AclDbMod;

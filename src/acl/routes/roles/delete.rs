@@ -5,16 +5,16 @@ use diesel::RunQueryDsl;
 use rocket::delete;
 use rocket_contrib::uuid::Uuid;
 
-use crate::acl::guards::HasPermission;
+use crate::acl::guards::HasRole;
 use crate::acl::models::Role;
 use crate::acl::schema::roles;
-use crate::permissions::RolesDelete;
+use crate::roles::AdminRole;
 use crate::{ApiResponse, DbConnection, ServerError};
 
 #[delete("/<role_id>", format = "application/json; charset=UTF-8")]
 pub fn delete(
     role_id: Uuid,
-    _perm: HasPermission<RolesDelete>,
+    _perm: HasRole<AdminRole>,
     db: DbConnection,
 ) -> Result<ApiResponse, ServerError> {
     // Convert from Rocket Uuid Type to uuid crate Uuid

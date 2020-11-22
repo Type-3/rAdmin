@@ -1,4 +1,3 @@
-use diesel::PgConnection;
 use serde::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 use uuid::Uuid;
@@ -7,7 +6,6 @@ use validator::ValidationErrors;
 use validator_derive::Validate;
 
 use crate::acl::models::Account;
-use crate::acl::traits::{HasPermissions, HasRoles};
 use crate::acl::Auth;
 use crate::traits::{Fillable, Validatable};
 use crate::ServerError;
@@ -29,8 +27,7 @@ pub struct AccountRequest {
     pub password: Option<String>,
     pub password_confirm: Option<String>,
     pub roles: Vec<Uuid>,
-    pub permissions: Vec<Uuid>,
-    pub avatar: Option<Uuid>
+    pub avatar: Option<Uuid>,
 }
 
 impl Validatable for AccountRequest {
@@ -41,12 +38,13 @@ impl Validatable for AccountRequest {
 }
 
 impl Fillable<Account> for AccountRequest {
-    fn fill(self, account: &mut Account, conn: &PgConnection) -> Result<(), ServerError> {
+    fn fill(self, account: &mut Account) -> Result<(), ServerError> {
         let config = crate::config::get_rocket_config(None)?;
         account.email = self.email;
         account.username = self.username;
         account.password_salt = Auth::generate_salt();
         account.avatar = self.avatar;
+        account.roles = self.roles;
         if let Some(pass) = self.password {
             account.password_hash = Auth::hash_password(
                 &pass,
@@ -54,8 +52,6 @@ impl Fillable<Account> for AccountRequest {
                 Auth::get_password_hash(&config),
             )?;
         }
-        account.sync_roles(&self.roles, conn)?;
-        account.sync_permissions(&self.permissions, conn)?;
         Ok(())
     }
 }

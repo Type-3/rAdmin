@@ -3,12 +3,11 @@ use rocket::{self, post, Config, State};
 use rocket_contrib::json::Json;
 use serde_json::json;
 
-use crate::ServerError;
 use crate::acl::guards::Unauthenticated;
 use crate::acl::models::Account;
-use crate::acl::schema::accounts::dsl::*;
-use crate::acl::traits::{HasPermissions, HasRoles};
+use crate::acl::schema::accounts;
 use crate::acl::Auth;
+use crate::ServerError;
 use crate::{ApiResponse, DbConnection};
 
 #[post(
@@ -24,9 +23,9 @@ pub fn login(
 ) -> Result<ApiResponse, ServerError> {
     account_in.validate()?;
 
-    let mut account = accounts
-        .filter(username.eq(&account_in.username))
-        .or_filter(email.eq(&account_in.username))
+    let mut account = accounts::table
+        .filter(accounts::username.eq(&account_in.username))
+        .or_filter(accounts::email.eq(&account_in.username))
         .first::<Account>(&*db)
         .or_else(|_| {
             // Hash password here to prevent a timing attack.
@@ -43,8 +42,7 @@ pub fn login(
         "email": &account.email,
         "avatar": &account.avatar,
         "username": &account.username,
-        "permissions": account.permission_names(db.as_ref())?,
-        "roles": account.role_names(db.as_ref())?
+        "roles": account.roles
     });
 
     Ok(ApiResponse::ok().data(response))

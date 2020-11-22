@@ -4,9 +4,6 @@ pub use self::accounts::AccountRequest;
 mod role;
 pub use self::role::RoleRequest;
 
-mod permission;
-pub use self::permission::PermissionRequest;
-
 use serde::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 use validator::Validate;

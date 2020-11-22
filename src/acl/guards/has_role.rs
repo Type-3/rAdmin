@@ -5,9 +5,12 @@ use rocket::Outcome;
 use std::marker::PhantomData;
 
 use super::AuthorizedAccount;
-use crate::acl::traits::HasRoles;
+use crate::acl::models::Role;
+use crate::acl::schema::roles;
 use crate::roles::RoleDef;
 use crate::DbConnection;
+use diesel::query_dsl::filter_dsl::FilterDsl;
+use diesel::{ExpressionMethods, RunQueryDsl};
 
 /// Generic request guard that will check that the authorized user
 /// has a particular role.
@@ -21,10 +24,12 @@ impl<'a, 'r, T: RoleDef> FromRequest<'a, 'r> for HasRole<T> {
     fn from_request(request: &'a Request<'r>) -> request::Outcome<HasRole<T>, ()> {
         let account = request.guard::<AuthorizedAccount>()?.0;
         let db = request.guard::<DbConnection>()?.0;
-        if account
-            .has_role_name(T::NAME, &db)
-            .map_err(|_| Err((Status::Unauthorized, ())))?
-        {
+        let role: Role = roles::table
+            .filter(roles::name.eq(T::NAME))
+            .first(&db)
+            .map_err(|_| Err((Status::Unauthorized, ())))?;
+
+        if account.roles.contains(&role.id) {
             Outcome::Success(HasRole {
                 _phantom: Default::default(),
             })

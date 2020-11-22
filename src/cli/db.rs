@@ -1,8 +1,6 @@
 use crate::modules::CliModule;
 use crate::ServerError;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
-use cli_table::format::{CellFormat, Color, TableFormat};
-use cli_table::{Cell, Row, Table};
 
 pub struct Database<'a>(&'a crate::Application);
 
@@ -35,11 +33,7 @@ impl<'a> CliModule for Database<'a> {
                         .arg(Arg::with_name("seed").short("s").long("seed")),
                 )
                 .subcommand(seed_cmd)
-                .subcommand(SubCommand::with_name("reset"))
-                .subcommand(
-                    SubCommand::with_name("search")
-                        .arg(Arg::with_name("query").index(1).required(true)),
-                ),
+                .subcommand(SubCommand::with_name("reset")),
         )
     }
 
@@ -50,7 +44,6 @@ impl<'a> CliModule for Database<'a> {
                 ("init", matches) => self.handle_init_command(matches)?,
                 ("seed", matches) => self.handle_seed_command(matches)?,
                 ("reset", matches) => self.handle_reset_command(matches)?,
-                ("search", matches) => self.handle_search_command(matches)?,
                 _ => {}
             },
         }
@@ -92,7 +85,7 @@ impl<'a> Database<'a> {
                 module.version()
             );
             match (*module).database().seeder().seed(matches, &conn) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(err) => {
                     println!("{}({}): {:?}", module.identifier(), module.version(), err);
                 }
@@ -100,47 +93,4 @@ impl<'a> Database<'a> {
         }
         Ok(())
     }
-
-    fn handle_search_command(&self, matches: Option<&ArgMatches>) -> Result<(), ServerError> {
-        let query = matches.unwrap().value_of("query").unwrap();
-        let search_args = self.0.modules.get_search_arguments()?;
-        let results = crate::controllers::GlobalSearch::new(search_args).query(query)?;
-        let mut rows = vec![Row::new(vec![
-            Cell::new("Context", header_format()),
-            Cell::new("Fields", header_format()),
-            Cell::new("Id", header_format()),
-        ])];
-        for result in &results {
-            let ctx = Cell::new(&result.context, Default::default());
-            let id = Cell::new(&result.id, Default::default());
-            let mut fields = String::new();
-            for (dex, (field, value)) in result.fields.iter().enumerate() {
-                if dex > 0 {
-                    fields.push('\n');
-                }
-                fields.push_str(&format!("{}: {}", field, value));
-            }
-            rows.push(Row::new(vec![
-                ctx,
-                Cell::new(&fields, Default::default()),
-                id,
-            ]));
-        }
-        Table::new(rows, table_format())
-            .unwrap()
-            .print_stdout()
-            .unwrap();
-        Ok(())
-    }
-}
-
-fn header_format() -> CellFormat {
-    CellFormat::builder()
-        .foreground_color(Some(Color::Yellow))
-        .bold(true)
-        .build()
-}
-
-fn table_format() -> TableFormat {
-    TableFormat::default().foreground(Color::Red)
 }

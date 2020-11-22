@@ -7,7 +7,7 @@ use crate::ServerError;
 pub struct CliApp<'a> {
     app: &'a crate::Application,
     database: Database<'a>,
-    storage: Storage<'a>
+    storage: Storage<'a>,
 }
 
 impl<'a> CliApp<'a> {
@@ -15,7 +15,7 @@ impl<'a> CliApp<'a> {
         CliApp {
             app: &app,
             database: Database::new(&app),
-            storage: Storage::new(&app)
+            storage: Storage::new(&app),
         }
     }
 }

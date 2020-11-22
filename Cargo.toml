@@ -24,7 +24,6 @@ validator = "^0.11"
 rust-argon2 = "0.8.2"
 typed-builder = "^0.7"
 derive_more = "^0.99"
-diesel-factories = "1.0.1"
 diesel_migrations = "^1.4"
 validator_derive = "^0.11"
 radmin-macros = { path = "macros" }

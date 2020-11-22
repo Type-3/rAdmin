@@ -1,25 +1,20 @@
 use rocket::http::Status;
 use rocket_contrib::json;
 
-use radmin::acl::factories::{AccountFactory, PermissionFactory};
-use radmin::acl::traits::HasPermissions;
+use radmin::acl::factories::{AccountFactory, RoleFactory};
 use radmin::client::ApiClient;
 
 #[test]
 fn simple_success() {
     let mut client = ApiClient::new(None).expect("Failed to build test client");
+    let admin_role = RoleFactory::default()
+        .name("admin")
+        .insert(client.db.as_ref());
     let account = AccountFactory::default()
+        .roles(vec![admin_role.id])
         .set_password("password")
         .expect("Failed to set account password")
         .insert(client.db.as_ref());
-
-    PermissionFactory::default()
-        .name("admin.accounts.modify")
-        .insert(client.db.as_ref());
-
-    account
-        .assign_permission_name("admin.accounts.modify", client.db.as_ref())
-        .unwrap();
 
     client.acting_as("password", account);
 
@@ -31,8 +26,7 @@ fn simple_success() {
                 "username": "username",
                 "password": "password",
                 "password_confirm": "password",
-                "roles": [],
-                "permissions": []
+                "roles": []
             })
             .to_string(),
         )

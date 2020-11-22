@@ -20,7 +20,7 @@ impl<'a> CliModule for Storage<'a> {
             SubCommand::with_name("storage")
                 .setting(AppSettings::SubcommandRequiredElseHelp)
                 .subcommand(SubCommand::with_name("reset"))
-                .subcommand(SubCommand::with_name("info"))
+                .subcommand(SubCommand::with_name("info")),
         )
     }
 
@@ -38,7 +38,6 @@ impl<'a> CliModule for Storage<'a> {
 }
 
 impl<'a> Storage<'a> {
-
     fn handle_reset_command(&self, _: Option<&ArgMatches>) -> Result<(), ServerError> {
         let data_path = std::env::var("STORAGE_PATH").unwrap_or_else(|_| "data".into());
         for module in &self.0.modules.0 {

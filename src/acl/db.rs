@@ -1,7 +1,6 @@
 use diesel::PgConnection;
 
 use super::AclSeeder;
-use crate::controllers::SearchConfig;
 use crate::modules::DatabaseModule;
 use crate::modules::Seeder;
 use crate::ServerError;
@@ -16,28 +15,5 @@ impl DatabaseModule for AclDbMod {
     /// automatically.
     fn run_migrations(&self, _: &PgConnection) -> Result<(), ServerError> {
         Ok(())
-    }
-
-    fn search(&self) -> Result<SearchConfig, ServerError> {
-        Ok(vec![
-            (
-                "roles".into(),
-                "Role".into(),
-                "admin.roles.list".into(),
-                vec!["name".into(), "label".into(), "description".into()],
-            ),
-            (
-                "permissions".into(),
-                "Permission".into(),
-                "admin.permissions.list".into(),
-                vec!["name".into(), "label".into(), "description".into()],
-            ),
-            (
-                "accounts".into(),
-                "Account".into(),
-                "admin.accounts.list".into(),
-                vec!["email".into(), "username".into()],
-            ),
-        ])
     }
 }

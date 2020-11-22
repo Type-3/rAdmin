@@ -2,10 +2,10 @@ use diesel::{PgConnection, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use rocket::get;
 use serde_json::json;
 
-use crate::acl::guards::HasPermission;
+use crate::acl::guards::HasRole;
 use crate::acl::models::Role;
 use crate::acl::schema::roles;
-use crate::permissions::RolesList;
+use crate::roles::AdminRole;
 use crate::traits::Paginate;
 use crate::{ApiResponse, DbConnection, ServerError};
 
@@ -14,7 +14,7 @@ use crate::{ApiResponse, DbConnection, ServerError};
     format = "application/json; charset=UTF-8"
 )]
 pub fn data(
-    _perm: HasPermission<RolesList>,
+    _perm: HasRole<AdminRole>,
     db: DbConnection,
     page: Option<i64>,
     per_page: Option<i64>,

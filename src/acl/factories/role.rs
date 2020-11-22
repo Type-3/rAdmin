@@ -1,13 +1,12 @@
-use diesel::PgConnection;
-use diesel_factories::Factory;
+use diesel::{PgConnection, RunQueryDsl};
 use fake::{Dummy, Fake, Faker};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::acl::models::Role;
+use crate::acl::schema::roles;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Factory, Dummy)]
-#[factory(model = "Role", table = "crate::acl::schema::roles", id = "Uuid")]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Insertable, Dummy)]
+#[table_name = "roles"]
 pub struct RoleFactory {
     #[dummy("Word()")]
     pub name: String,
@@ -15,12 +14,33 @@ pub struct RoleFactory {
     pub label: Option<String>,
     #[dummy("Sentence()")]
     pub description: Option<String>,
-    pub is_super: bool
+    pub is_super: bool,
 }
 
 impl RoleFactory {
+    pub fn name<S: Into<String>>(mut self, name: S) -> RoleFactory {
+        self.name = name.into();
+        self
+    }
+    pub fn label<S: Into<Option<String>>>(mut self, label: S) -> RoleFactory {
+        self.label = label.into();
+        self
+    }
+    pub fn description<S: Into<Option<String>>>(mut self, description: S) -> RoleFactory {
+        self.description = description.into();
+        self
+    }
+
+    pub fn is_super(mut self, b: bool) -> RoleFactory {
+        self.is_super = b;
+        self
+    }
+
     pub fn insert(self, conn: &PgConnection) -> Role {
-        Factory::insert(self, conn)
+        diesel::insert_into(crate::acl::schema::roles::table)
+            .values(&self)
+            .get_result(conn)
+            .expect(&format!("Failed to insert into database: {:?}", &self))
     }
 }
 

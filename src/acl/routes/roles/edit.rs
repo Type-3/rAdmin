@@ -5,10 +5,10 @@ use rocket::post;
 use rocket_contrib::json::Json;
 use rocket_contrib::uuid::Uuid;
 
-use crate::acl::guards::HasPermission;
+use crate::acl::guards::HasRole;
 use crate::acl::models::Role;
 use crate::acl::schema::roles;
-use crate::permissions::RolesModify;
+use crate::roles::AdminRole;
 use crate::traits::{Fillable, Validatable};
 use crate::{ApiResponse, DbConnection, ServerError};
 
@@ -18,7 +18,7 @@ use crate::{ApiResponse, DbConnection, ServerError};
     format = "application/json; charset=UTF-8"
 )]
 pub fn update(
-    _perm: HasPermission<RolesModify>,
+    _perm: HasRole<AdminRole>,
     role_id: Uuid,
     form: Json<crate::acl::requests::RoleRequest>,
     db: DbConnection,
@@ -26,7 +26,7 @@ pub fn update(
     let req = form.into_inner().validate()?;
     let uuid: ::uuid::Uuid = ::uuid::Uuid::from_str(&role_id.to_string()).unwrap();
     let mut role: Role = roles::table.find(uuid).first(db.as_ref())?;
-    req.fill(&mut role, db.as_ref())?;
+    req.fill(&mut role)?;
     role.save_changes::<Role>(db.as_ref())?;
     Ok(ApiResponse::ok())
 }

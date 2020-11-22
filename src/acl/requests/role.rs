@@ -1,12 +1,9 @@
-use diesel::PgConnection;
 use serde::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
-use uuid::Uuid;
 use validator::{Validate, ValidationErrors};
 use validator_derive::Validate;
 
 use crate::acl::models::Role;
-use crate::acl::traits::HasPermissions;
 use crate::traits::{Fillable, Validatable};
 use crate::ServerError;
 
@@ -27,8 +24,7 @@ pub struct RoleRequest {
         length(max = 256, message = "Description is to long")
     )]
     pub description: Option<String>,
-    pub permissions: Vec<Uuid>,
-    pub is_super: bool
+    pub is_super: bool,
 }
 
 impl Validatable for RoleRequest {
@@ -39,12 +35,11 @@ impl Validatable for RoleRequest {
 }
 
 impl Fillable<Role> for RoleRequest {
-    fn fill(self, role: &mut Role, conn: &PgConnection) -> Result<(), ServerError> {
+    fn fill(self, role: &mut Role) -> Result<(), ServerError> {
         role.name = self.name;
         role.label = self.label;
         role.description = self.description;
         role.is_super = self.is_super;
-        role.sync_permissions(&self.permissions, conn)?;
         Ok(())
     }
 }

@@ -25,11 +25,8 @@ pub mod acl;
 pub mod cli;
 pub mod client;
 pub mod config;
-pub mod controllers;
 pub mod modules;
-pub mod permissions;
 pub mod roles;
-pub mod routes;
 pub mod traits;
 pub mod types;
 
@@ -38,11 +35,10 @@ pub use self::database::{establish_connection, DbConnection};
 pub use self::error::ServerError;
 pub use self::response::ApiResponse;
 pub use clap::{crate_authors, crate_description, crate_name, crate_version};
-pub use radmin_macros::{from_similar, Permission, Role};
+pub use radmin_macros::{from_similar, Role};
 
-use crate::controllers::GlobalSearch;
 use crate::modules::{CliModule, Modules};
-use rocket::{routes, Rocket};
+use rocket::Rocket;
 
 pub fn rocket_factory(conf: Option<&str>, modules: &Modules) -> Result<Rocket, ServerError> {
     let mut config = config::get_rocket_config(conf)?;
@@ -51,14 +47,10 @@ pub fn rocket_factory(conf: Option<&str>, modules: &Modules) -> Result<Rocket, S
         config = (*module).config(config);
     }
 
-    let global_search = GlobalSearch::new(modules.get_search_arguments()?);
-
     let mut rocket = rocket::custom(config.clone())
         .attach(DbConnection::fairing())
         .manage(config)
-        .manage(global_search)
-        .register(errors::api_errors())
-        .mount("/api/", routes![routes::search::search]);
+        .register(errors::api_errors());
 
     for module in modules.0.iter() {
         for (path, route) in (*module).routes().routes() {

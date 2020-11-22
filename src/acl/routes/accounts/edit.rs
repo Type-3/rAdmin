@@ -4,10 +4,10 @@ use rocket_contrib::json::Json;
 use rocket_contrib::uuid::Uuid;
 use std::str::FromStr;
 
-use crate::acl::guards::HasPermission;
+use crate::acl::guards::HasRole;
 use crate::acl::models::Account;
 use crate::acl::schema::accounts;
-use crate::permissions::AccountsModify;
+use crate::roles::AdminRole;
 use crate::traits::{Fillable, Validatable};
 use crate::{ApiResponse, DbConnection, ServerError};
 
@@ -17,7 +17,7 @@ use crate::{ApiResponse, DbConnection, ServerError};
     format = "application/json; charset=UTF-8"
 )]
 pub fn update(
-    _perm: HasPermission<AccountsModify>,
+    _perm: HasRole<AdminRole>,
     account_id: Uuid,
     form: Json<crate::acl::requests::AccountRequest>,
     db: DbConnection,
@@ -25,7 +25,7 @@ pub fn update(
     let req = form.into_inner().validate()?;
     let uuid: ::uuid::Uuid = ::uuid::Uuid::from_str(&account_id.to_string()).unwrap();
     let mut account: Account = accounts::table.find(uuid).first(db.as_ref())?;
-    req.fill(&mut account, db.as_ref())?;
+    req.fill(&mut account)?;
     account.save_changes::<Account>(db.as_ref())?;
     Ok(ApiResponse::ok())
 }

@@ -1,9 +1,8 @@
 use radmin::rocket::http::Status;
 
-use radmin::acl::factories::{AccountFactory, PermissionFactory};
+use radmin::acl::factories::{AccountFactory, RoleFactory};
 use radmin::acl::models::Account;
 use radmin::acl::schema::accounts;
-use radmin::acl::traits::HasPermissions;
 
 use radmin::client::ApiClient;
 
@@ -11,20 +10,19 @@ use radmin::client::ApiClient;
 fn simple_success() {
     let mut client = ApiClient::new(None).expect("Failed to build test client");
 
+    let admin_role = RoleFactory::default()
+        .name("admin")
+        .insert(client.db.as_ref());
     let account = AccountFactory::default()
+        .roles(vec![admin_role.id])
         .set_password("password")
         .expect("Failed to set account password")
         .insert(client.db.as_ref());
 
-    let account2 = AccountFactory::default().insert(client.db.as_ref());
-
-    PermissionFactory::default()
-        .name("admin.accounts.delete")
+    let account2 = AccountFactory::default()
+        .set_password("password")
+        .expect("Failed to set account password")
         .insert(client.db.as_ref());
-
-    account
-        .assign_permission_name("admin.accounts.delete", client.db.as_ref())
-        .unwrap();
 
     client.acting_as("password", account);
     let route = format!("/api/admin/accounts/{}", account2.id);

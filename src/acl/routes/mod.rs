@@ -1,6 +1,5 @@
 pub mod accounts;
 pub mod auth;
-pub mod permissions;
 pub mod roles;
 
 mod avatar;
@@ -15,7 +14,6 @@ impl RoutesModule for AclRoutesMod {
             ("auth".into(), auth::api_routes()),
             ("avatars".into(), rocket::routes![avatar::avatar_image]),
             ("admin/roles".into(), roles::api_routes()),
-            ("admin/permissions".into(), permissions::api_routes()),
             ("admin/accounts".into(), accounts::api_routes()),
         ]
     }

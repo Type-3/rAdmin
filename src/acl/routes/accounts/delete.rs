@@ -4,16 +4,16 @@ use rocket::{self, delete};
 use rocket_contrib::uuid::Uuid;
 use std::str::FromStr;
 
-use crate::acl::guards::HasPermission;
+use crate::acl::guards::HasRole;
 use crate::acl::models::Account;
 use crate::acl::schema::accounts;
-use crate::permissions::AccountsDelete;
+use crate::roles::AdminRole;
 use crate::{ApiResponse, DbConnection, ServerError};
 
 #[delete("/<account_id>", format = "application/json; charset=UTF-8")]
 pub fn delete(
     account_id: Uuid,
-    _perm: HasPermission<AccountsDelete>,
+    _perm: HasRole<AdminRole>,
     db: DbConnection,
 ) -> Result<ApiResponse, ServerError> {
     // Convert from Rocket Uuid Type to uuid crate Uuid

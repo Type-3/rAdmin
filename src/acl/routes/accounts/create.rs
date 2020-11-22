@@ -2,9 +2,9 @@ use rocket::{post, Config, State};
 use rocket_contrib::json::Json;
 
 use crate::acl::forms::AccountCreateForm;
-use crate::acl::guards::HasPermission;
+use crate::acl::guards::HasRole;
 use crate::acl::Auth;
-use crate::permissions::AccountsModify;
+use crate::roles::AdminRole;
 use crate::traits::{Submitable, Validatable};
 use crate::{ApiResponse, DbConnection, ServerError};
 
@@ -14,7 +14,7 @@ use crate::{ApiResponse, DbConnection, ServerError};
     format = "application/json; charset=UTF-8"
 )]
 pub fn store(
-    _perm: HasPermission<AccountsModify>,
+    _perm: HasRole<AdminRole>,
     account: Json<crate::acl::requests::AccountRequest>,
     app_config: State<Config>,
     db: DbConnection,

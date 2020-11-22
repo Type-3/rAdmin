@@ -1,8 +1,7 @@
 use radmin::rocket::http::Status;
 use radmin::serde_json::json;
 
-use radmin::acl::factories::{AccountFactory, PermissionFactory, RoleFactory};
-use radmin::acl::traits::{HasPermissions, HasRoles};
+use radmin::acl::factories::{AccountFactory, RoleFactory};
 
 use radmin::client::ApiClient;
 
@@ -10,23 +9,16 @@ use radmin::client::ApiClient;
 fn simple_success() {
     let mut client = ApiClient::new(None).expect("Failed to build test client");
 
+    let admin_role = RoleFactory::default()
+        .name("admin")
+        .insert(client.db.as_ref());
     let account = AccountFactory::default()
+        .roles(vec![admin_role.id])
         .set_password("password")
         .expect("Failed to set account password")
         .insert(client.db.as_ref());
 
-    PermissionFactory::default()
-        .name("admin.roles.list")
-        .insert(client.db.as_ref());
-
-    let role1 = RoleFactory::default().insert(client.db.as_ref());
-    role1
-        .assign_permission_name("admin.roles.list", client.db.as_ref())
-        .unwrap();
-    account
-        .assign_role_id(role1.id, client.db.as_ref())
-        .unwrap();
-    let items = vec![json!(role1)];
+    let items = vec![json!(admin_role)];
 
     client.acting_as("password", account);
 
@@ -46,13 +38,13 @@ fn simple_success() {
 fn unauthorized() {
     let mut client = ApiClient::new(None).expect("Failed to build test client");
 
+    let admin_role = RoleFactory::default()
+        .name("other")
+        .insert(client.db.as_ref());
     let account = AccountFactory::default()
+        .roles(vec![admin_role.id])
         .set_password("password")
         .expect("Failed to set account password")
-        .insert(client.db.as_ref());
-
-    PermissionFactory::default()
-        .name("admin.roles.list")
         .insert(client.db.as_ref());
 
     client.acting_as("password", account);

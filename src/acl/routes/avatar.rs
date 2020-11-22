@@ -1,8 +1,8 @@
 use std::io::Error;
 
-use rocket::response::NamedFile;
 use crate::acl::guards::AuthorizedAccount;
-use rocket::{State, Config};
+use rocket::response::NamedFile;
+use rocket::{Config, State};
 
 #[rocket::get("/<id>?")]
 pub fn avatar_image(

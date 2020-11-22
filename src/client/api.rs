@@ -1,8 +1,6 @@
 use super::DbClient;
 use crate::acl::models::Account;
-use crate::acl::schema::{
-    account_permissions, account_roles, accounts, permissions, role_permissions, roles,
-};
+use crate::acl::schema::{accounts, roles};
 use crate::acl::Auth;
 use crate::modules::Modules;
 use crate::rocket_factory;
@@ -29,13 +27,7 @@ impl ApiClient {
         let modules = modules.unwrap_or_default();
         let client = Client::new(rocket_factory(Some("testing"), &modules)?)?;
         let db = DbClient::new(Some(&modules)).unwrap();
-        truncate_tables!(
-            db.as_ref(),
-            account_roles,
-            account_permissions,
-            role_permissions
-        );
-        truncate_tables!(db.as_ref(), accounts, roles, permissions);
+        truncate_tables!(db.as_ref(), accounts, roles);
         Ok(ApiClient {
             account: None,
             client,

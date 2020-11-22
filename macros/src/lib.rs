@@ -22,47 +22,6 @@ pub fn b(input: TokenStream) -> TokenStream {
     output.into()
 }
 
-#[proc_macro_derive(Permission, attributes(name, prefix))]
-pub fn derive_permission(input: TokenStream) -> TokenStream {
-    let derive_input = parse_macro_input!(input as syn::DeriveInput);
-
-    let ident = derive_input.ident;
-
-    let mut attr_name = None;
-    let mut attr_name_prefix = None;
-
-    for attr in derive_input.attrs {
-        if let Some(path) = attr.path.get_ident() {
-            let ident_string = format!("{}", path);
-            match ident_string.as_ref() {
-                "name" => {
-                    if let Ok(string) = attr.parse_args::<syn::LitStr>() {
-                        attr_name = Some(string.value());
-                    }
-                }
-                "prefix" => {
-                    if let Ok(string) = attr.parse_args::<syn::LitStr>() {
-                        attr_name_prefix = Some(string.value());
-                    }
-                }
-                _ => {}
-            }
-        }
-    }
-
-    let _name = attr_name.unwrap_or_else(|| ident_to_snake_case(&format!("{}", ident)));
-    let prefix = attr_name_prefix
-        .map(|item| format!("{}.", item))
-        .unwrap_or_else(String::new);
-    let name = format!("{}{}", prefix, _name);
-    let tokens = quote! {
-        impl PermissionDef for #ident {
-            const NAME: &'static str = #name;
-        }
-    };
-    tokens.into()
-}
-
 #[proc_macro_derive(Role, attributes(name))]
 pub fn derive_role(input: TokenStream) -> TokenStream {
     let derive_input = parse_macro_input!(input as syn::DeriveInput);

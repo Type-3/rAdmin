@@ -1,7 +1,6 @@
 use diesel::PgConnection;
 
 use super::{NullSeeder, Seeder};
-use crate::controllers::SearchConfig;
 use crate::ServerError;
 
 pub trait DatabaseModule {
@@ -9,10 +8,6 @@ pub trait DatabaseModule {
         Box::new(NullSeeder)
     }
     fn run_migrations(&self, _: &PgConnection) -> Result<(), ServerError>;
-
-    fn search(&self) -> Result<SearchConfig, ServerError> {
-        Ok(vec![])
-    }
 }
 
 pub struct NullDatabaseModule;

@@ -3,7 +3,6 @@ use crate::ServerError;
 use clap::{App, AppSettings, ArgMatches, SubCommand};
 
 mod accounts;
-mod permissions;
 mod roles;
 mod tables;
 
@@ -19,8 +18,7 @@ impl CliModule for AclCli {
             SubCommand::with_name("acl")
                 .setting(AppSettings::SubcommandRequiredElseHelp)
                 .subcommand(accounts::Accounts.app().unwrap())
-                .subcommand(roles::Roles.app().unwrap())
-                .subcommand(permissions::Permissions.app().unwrap()),
+                .subcommand(roles::Roles.app().unwrap()),
         )
     }
 
@@ -30,7 +28,6 @@ impl CliModule for AclCli {
             Some(matches) => match matches.subcommand() {
                 ("accounts", matches) => accounts::Accounts.handle(matches)?,
                 ("roles", matches) => roles::Roles.handle(matches)?,
-                ("permissions", matches) => permissions::Permissions.handle(matches)?,
                 _ => {}
             },
         }
