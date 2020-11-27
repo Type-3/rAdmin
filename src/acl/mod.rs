@@ -16,11 +16,8 @@ pub use self::auth::Auth;
 mod seeder;
 pub use self::seeder::AclSeeder;
 
-#[derive(Default, Clone)]
-pub struct AclModuleConfig {
-    pub enable_register_route: bool,
-    pub enable_admin_crud: bool
-}
+mod config;
+pub use self::config::AclModuleConfig;
 
 #[derive(Default)]
 pub struct AclModule {

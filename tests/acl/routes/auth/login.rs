@@ -16,7 +16,7 @@ fn simple_success() {
     assert_eq!(
         client
             .post("/api/auth/login")
-            .body(json!({"username": account.username, "password": "password"}).to_string())
+            .body(json!({"identifier": account.username, "password": "password"}).to_string())
             .dispatch()
             .status(),
         Status::Ok
@@ -39,7 +39,7 @@ fn failure() {
     assert_eq!(
         client
             .post("/api/auth/login")
-            .body(json!({"username": account.username, "password": "pass"}).to_string())
+            .body(json!({"identifier": account.username, "password": "pass"}).to_string())
             .dispatch()
             .status(),
         Status::Unauthorized

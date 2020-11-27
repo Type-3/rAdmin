@@ -5,10 +5,15 @@ use radmin::acl::models::Account;
 use radmin::acl::schema::accounts;
 
 use radmin::client::ApiClient;
+use radmin::acl::{AclModuleConfig, AclModule};
+use radmin::modules::Modules;
 
 #[test]
 fn simple_success() {
-    let mut client = ApiClient::new(None).expect("Failed to build test client");
+    let acl_config = AclModuleConfig::default().set_enable_crud("admin/");
+    let mut modules = Modules::new();
+    modules.add_module(AclModule::new(acl_config));
+    let mut client = ApiClient::new(Some(modules)).expect("Failed to build test client");
 
     let admin_role = RoleFactory::default()
         .name("admin")

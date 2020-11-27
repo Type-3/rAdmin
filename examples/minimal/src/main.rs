@@ -1,6 +1,8 @@
 use radmin::{
     crate_authors, crate_description, crate_name, crate_version, Application, ServerError,
 };
+use radmin::modules::Modules;
+use radmin::acl::{AclModule, AclModuleConfig};
 
 fn main() -> Result<(), ServerError> {
     let app = Application::default()
