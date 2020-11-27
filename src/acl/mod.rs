@@ -18,8 +18,8 @@ pub use self::seeder::AclSeeder;
 
 #[derive(Default, Clone)]
 pub struct AclModuleConfig {
-    enable_register_route: bool,
-    enable_admin_crud: bool
+    pub enable_register_route: bool,
+    pub enable_admin_crud: bool
 }
 
 #[derive(Default)]
