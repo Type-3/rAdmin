@@ -62,7 +62,7 @@ impl AccountFactory {
         diesel::insert_into(crate::acl::schema::accounts::table)
             .values(&self)
             .get_result(conn)
-            .expect(&format!("Failed to insert into database: {:?}", &self))
+            .unwrap_or_else(|err| panic!("Failed to insert into database: {:?}", err))
     }
 }
 

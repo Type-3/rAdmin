@@ -14,7 +14,7 @@ use validator_derive::Validate;
 pub struct LoginRequest {
     #[builder(setter(into))]
     #[validate(length(min = 4))]
-    pub username: String,
+    pub identifier: String,
     #[builder(setter(into))]
     #[validate(length(min = 4, message = "Password to small"))]
     #[validate(length(max = 25, message = "Password to long"))]

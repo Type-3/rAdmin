@@ -41,10 +41,12 @@ impl Seeder for AclSeeder {
                                 .select(roles::id)
                                 .filter(roles::name.eq(item.as_str().unwrap()))
                                 .first::<uuid::Uuid>(conn)
-                                .expect(&format!(
-                                    "Role named `{}` does not exists",
-                                    item.as_str().unwrap()
-                                ))
+                                .unwrap_or_else(|_| {
+                                    panic!(
+                                        "Role named `{}` does not exists",
+                                        item.as_str().unwrap()
+                                    )
+                                })
                         })
                         .collect::<Vec<uuid::Uuid>>());
                 }

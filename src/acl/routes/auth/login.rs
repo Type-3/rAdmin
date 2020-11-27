@@ -24,13 +24,13 @@ pub fn login(
     account_in.validate()?;
 
     let mut account = accounts::table
-        .filter(accounts::username.eq(&account_in.username))
-        .or_filter(accounts::email.eq(&account_in.username))
+        .filter(accounts::username.eq(&account_in.identifier))
+        .or_filter(accounts::email.eq(&account_in.identifier))
         .first::<Account>(&*db)
-        .or_else(|_| {
+        .map_err(|_| {
             // Hash password here to prevent a timing attack.
             Auth::hash_nonsense(None).unwrap();
-            Err(ServerError::Diesel(diesel::result::Error::NotFound))
+            ServerError::Diesel(diesel::result::Error::NotFound)
         })?;
 
     if !Auth::perform_login(&mut account, &account_in.password, db.as_ref())? {

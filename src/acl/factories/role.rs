@@ -31,6 +31,7 @@ impl RoleFactory {
         self
     }
 
+    #[allow(clippy::wrong_self_convention)]
     pub fn is_super(mut self, b: bool) -> RoleFactory {
         self.is_super = b;
         self
@@ -40,7 +41,7 @@ impl RoleFactory {
         diesel::insert_into(crate::acl::schema::roles::table)
             .values(&self)
             .get_result(conn)
-            .expect(&format!("Failed to insert into database: {:?}", &self))
+            .unwrap_or_else(|err| panic!("Failed to insert into database: {:?}", err))
     }
 }
 
