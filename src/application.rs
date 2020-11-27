@@ -47,6 +47,11 @@ impl Application {
         self
     }
 
+    pub fn modules(mut self, modules: crate::modules::Modules) -> Application {
+        self.modules = modules;
+        self
+    }
+
     pub fn add_module<T: ServerModule + 'static>(mut self, module: T) -> Application {
         self.modules.add_module(module);
         self

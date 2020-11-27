@@ -16,7 +16,23 @@ pub use self::auth::Auth;
 mod seeder;
 pub use self::seeder::AclSeeder;
 
-pub struct AclModule;
+#[derive(Default, Clone)]
+pub struct AclModuleConfig {
+    enable_register_route: bool,
+    enable_admin_crud: bool
+}
+
+#[derive(Default)]
+pub struct AclModule {
+    config: AclModuleConfig
+}
+
+impl AclModule {
+
+    pub fn new(config: AclModuleConfig) -> AclModule {
+        AclModule { config }
+    }
+}
 
 impl crate::modules::ServerModule for AclModule {
     fn identifier(&self) -> &'static str {
@@ -40,6 +56,6 @@ impl crate::modules::ServerModule for AclModule {
     }
 
     fn routes(&self) -> Box<dyn crate::modules::RoutesModule> {
-        Box::new(routes::AclRoutesMod)
+        Box::new(routes::AclRoutesMod::new(self.config.clone()))
     }
 }
