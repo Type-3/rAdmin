@@ -43,7 +43,7 @@ pub struct RegisterRequest {
     //#[validate(must_match("password"))]
     #[validate(length(min = 4, message = "Password Confirm to short"))]
     #[validate(length(max = 25, message = "Password to long"))]
-    pub password_config: String,
+    pub password_confirm: String,
 }
 
 impl RegisterRequest {

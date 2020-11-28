@@ -16,7 +16,7 @@ fn simple_success() {
     assert_eq!(
         client
             .post("/api/auth/register")
-            .body(json!({"email": "some@email.com", "username": "newUsername", "password": "newPassword", "password_config": "newPassword"}).to_string())
+            .body(json!({"email": "some@email.com", "username": "newUsername", "password": "newPassword", "password_confirmpa": "newPassword"}).to_string())
             .dispatch()
             .status(),
         Status::Ok
