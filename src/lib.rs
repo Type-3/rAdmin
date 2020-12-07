@@ -22,9 +22,12 @@ mod errors;
 mod response;
 
 pub mod acl;
+pub mod select;
+pub mod table;
 pub mod cli;
 pub mod client;
 pub mod config;
+pub mod crud;
 pub mod modules;
 pub mod roles;
 pub mod traits;
@@ -54,7 +57,7 @@ pub fn rocket_factory(conf: Option<&str>, modules: &Modules) -> Result<Rocket, S
 
     for module in modules.0.iter() {
         for (path, route) in (*module).routes().routes() {
-            rocket = rocket.mount(&format!("/api/{}", path), route);
+            rocket = rocket.mount(&format!("/crud/{}", path), route);
         }
     }
 

@@ -41,7 +41,7 @@ where
             }
         };
 
-        let (data, pages, page, _per) = M::table()
+        let (data, _total, pages, page, _per) = M::table()
             .as_query()
             .paginate(page)
             .per_page(per_page)

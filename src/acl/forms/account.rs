@@ -35,6 +35,20 @@ impl AccountCreateForm {
     }
 }
 
+impl From<AccountRequest> for AccountCreateForm {
+    fn from(req: AccountRequest) -> AccountCreateForm {
+        AccountCreateForm {
+            email: req.email,
+            username: req.username,
+            password: req.password.unwrap(),
+            password_confirm: req.password_confirm.unwrap(),
+            roles: req.roles,
+            avatar: req.avatar,
+            pw_type: PasswordType::Argon2,
+        }
+    }
+}
+
 impl Submitable for AccountCreateForm {
     fn submit(self, conn: &PgConnection) -> Result<(), ServerError> {
         let mut account = AccountFactory::default()

@@ -18,7 +18,7 @@ fn simple_success() {
     client.acting_as("password", account.clone());
 
     assert_eq!(
-        client.post("/api/auth/logout").dispatch().status(),
+        client.post("/crud/auth/logout").dispatch().status(),
         Status::Ok
     );
 
@@ -35,7 +35,7 @@ fn unauthorized() {
         .insert(client.db.as_ref());
 
     assert_eq!(
-        client.post("/api/auth/logout").dispatch().status(),
+        client.post("/crud/auth/logout").dispatch().status(),
         Status::Unauthorized
     );
 }

@@ -5,8 +5,8 @@ use radmin::serde_json::json;
 use radmin::acl::factories::{AccountFactory, RoleFactory};
 use radmin::acl::models::Account;
 use radmin::acl::schema::accounts;
+use radmin::acl::{AclModule, AclModuleConfig};
 use radmin::client::ApiClient;
-use radmin::acl::{AclModuleConfig, AclModule};
 use radmin::modules::Modules;
 
 #[test]
@@ -14,8 +14,7 @@ fn simple_success() {
     let acl_config = AclModuleConfig::default().set_enable_crud("admin/");
     let mut modules = Modules::new();
     modules.add_module(AclModule::new(acl_config));
-    let mut client = ApiClient::new(Some(modules))
-        .expect("Failed to build test client");
+    let mut client = ApiClient::new(Some(modules)).expect("Failed to build test client");
 
     let admin_role = RoleFactory::default()
         .name("admin")
@@ -30,7 +29,7 @@ fn simple_success() {
 
     client.acting_as("password", account);
 
-    let mut response = client.get("/api/admin/accounts/tableData").dispatch();
+    let mut response = client.get("/crud/admin/accounts/tableData").dispatch();
 
     let req_account: Account = accounts::table
         .find(&account_id)

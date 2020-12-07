@@ -4,8 +4,8 @@ pub mod roles;
 
 mod avatar;
 
-use crate::modules::RoutesModule;
 use crate::acl::AclModuleConfig;
+use crate::modules::RoutesModule;
 
 pub struct AclRoutesMod(AclModuleConfig);
 

@@ -1,15 +1,18 @@
-mod create;
 mod delete;
-mod edit;
+mod update;
 mod select;
+mod store;
 mod table;
 
+use crate::select::ApiSelect;
+use crate::table::ApiTable;
+use crate::crud::{CrudDelete, CrudStore};
+
 pub fn api_routes() -> Vec<rocket::Route> {
-    rocket::routes![
-        table::data,
-        create::store,
-        edit::update,
-        delete::delete,
-        select::options
-    ]
+    let mut routes = rocket::routes![update::update];
+    routes.push(delete::RolesDelete::route());
+    routes.push(store::RolesStore::route());
+    routes.push(select::RoleSelect::route());
+    routes.push(table::RolesTable::route());
+    routes
 }

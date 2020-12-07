@@ -1,4 +1,36 @@
-use diesel::{PgConnection, QueryDsl, RunQueryDsl, TextExpressionMethods};
+use crate::table::ApiTable;
+use crate::ServerError;
+use diesel::{PgConnection, TextExpressionMethods, QueryDsl};
+use crate::roles::AdminRole;
+use crate::traits::Paginate;
+use crate::acl::schema::roles;
+use crate::acl::models::Role;
+
+pub struct RolesTable;
+
+impl ApiTable for RolesTable {
+    type Role = AdminRole;
+    type Model = Role;
+
+    fn query(conn: &PgConnection, query: Option<String>, page: Option<i64>, per_page: Option<i64>) -> Result<(Vec<Self::Model>, i64, i64, i64, i64), ServerError> {
+        if let Some(query) = query {
+            Ok(roles::table
+                .filter(roles::name.like(format!("%{}%", &query)))
+                .or_filter(roles::description.like(format!("%{}%", &query)))
+                .or_filter(roles::label.like(format!("%{}%", &query)))
+                .paginate(page)
+                .per_page(per_page)
+                .load_and_count_pages::<Role, PgConnection>(conn)?)
+        } else {
+            Ok(roles::table
+                .select(roles::all_columns)
+                .paginate(page)
+                .per_page(per_page)
+                .load_and_count_pages::<Role, PgConnection>(conn)?)
+        }
+    }
+}
+/*use diesel::{PgConnection, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use rocket::get;
 use serde_json::json;
 
@@ -20,7 +52,7 @@ pub fn data(
     per_page: Option<i64>,
     query: Option<String>,
 ) -> Result<ApiResponse, ServerError> {
-    let (items, total_pages, page, per_page) = if let Some(query) = query {
+    let (items, _total, total_pages, page, per_page) = if let Some(query) = query {
         roles::table
             .filter(roles::name.like(format!("%{}%", &query)))
             .or_filter(roles::description.like(format!("%{}%", &query)))
@@ -45,4 +77,4 @@ pub fn data(
         "per_page": per_page
     });
     Ok(ApiResponse::ok().data(json!(data)))
-}
+}*/

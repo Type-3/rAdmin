@@ -9,7 +9,6 @@ impl Default for Modules {
 }
 
 impl Modules {
-
     pub fn new() -> Modules {
         Modules(vec![])
     }

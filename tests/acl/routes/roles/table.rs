@@ -3,8 +3,8 @@ use radmin::serde_json::json;
 
 use radmin::acl::factories::{AccountFactory, RoleFactory};
 
+use radmin::acl::{AclModule, AclModuleConfig};
 use radmin::client::ApiClient;
-use radmin::acl::{AclModuleConfig, AclModule};
 use radmin::modules::Modules;
 
 #[test]
@@ -27,7 +27,7 @@ fn simple_success() {
 
     client.acting_as("password", account);
 
-    let mut response = client.get("/api/admin/roles/tableData").dispatch();
+    let mut response = client.get("/crud/admin/roles/tableData").dispatch();
     let res_data = json!({
         "items": items,
         "total": 1,
@@ -59,6 +59,9 @@ fn unauthorized() {
 
     assert_eq!(
         Status::Unauthorized,
-        client.get("/api/admin/roles/tableData").dispatch().status()
+        client
+            .get("/crud/admin/roles/tableData")
+            .dispatch()
+            .status()
     );
 }

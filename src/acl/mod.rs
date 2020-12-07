@@ -21,11 +21,10 @@ pub use self::config::AclModuleConfig;
 
 #[derive(Default)]
 pub struct AclModule {
-    config: AclModuleConfig
+    config: AclModuleConfig,
 }
 
 impl AclModule {
-
     pub fn new(config: AclModuleConfig) -> AclModule {
         AclModule { config }
     }

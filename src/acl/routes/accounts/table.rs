@@ -1,4 +1,35 @@
-use diesel::{PgConnection, QueryDsl, RunQueryDsl, TextExpressionMethods};
+use crate::table::ApiTable;
+use crate::ServerError;
+use diesel::{PgConnection, TextExpressionMethods, QueryDsl};
+use crate::roles::AdminRole;
+use crate::traits::Paginate;
+use crate::acl::schema::accounts;
+use crate::acl::models::Account;
+
+pub struct AccountsTable;
+
+impl ApiTable for AccountsTable {
+    type Role = AdminRole;
+    type Model = Account;
+
+    fn query(conn: &PgConnection, query: Option<String>, page: Option<i64>, per_page: Option<i64>) -> Result<(Vec<Self::Model>, i64, i64, i64, i64), ServerError> {
+        if let Some(query) = query {
+            Ok(accounts::table
+                .filter(accounts::username.like(format!("%{}%", query)))
+                .paginate(page)
+                .per_page(per_page)
+                .load_and_count_pages::<Account, PgConnection>(conn)?)
+        } else {
+            Ok(accounts::table
+                .select(accounts::all_columns)
+                .paginate(page)
+                .per_page(per_page)
+                .load_and_count_pages::<Account, PgConnection>(conn)?)
+        }
+    }
+}
+
+/*use diesel::{PgConnection, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use rocket::get;
 use serde_json::json;
 
@@ -20,7 +51,7 @@ pub fn data(
     per_page: Option<i64>,
     query: Option<String>,
 ) -> Result<ApiResponse, ServerError> {
-    let (items, total_pages, page, per_page) = if let Some(query) = query {
+    let (items, _total, total_pages, page, per_page) = if let Some(query) = query {
         accounts::table
             .filter(accounts::username.like(format!("%{}%", query)))
             .paginate(page)
@@ -43,4 +74,4 @@ pub fn data(
         "per_page": per_page
     });
     Ok(ApiResponse::ok().data(data))
-}
+}*/

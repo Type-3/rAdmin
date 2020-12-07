@@ -15,7 +15,7 @@ fn simple_success() {
 
     assert_eq!(
         client
-            .post("/api/auth/login")
+            .post("/crud/auth/login")
             .body(json!({"identifier": account.username, "password": "password"}).to_string())
             .dispatch()
             .status(),
@@ -38,7 +38,7 @@ fn failure() {
 
     assert_eq!(
         client
-            .post("/api/auth/login")
+            .post("/crud/auth/login")
             .body(json!({"identifier": account.username, "password": "pass"}).to_string())
             .dispatch()
             .status(),

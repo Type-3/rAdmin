@@ -4,8 +4,8 @@ use radmin::acl::factories::{AccountFactory, RoleFactory};
 use radmin::acl::models::Account;
 use radmin::acl::schema::accounts;
 
+use radmin::acl::{AclModule, AclModuleConfig};
 use radmin::client::ApiClient;
-use radmin::acl::{AclModuleConfig, AclModule};
 use radmin::modules::Modules;
 
 #[test]
@@ -30,7 +30,7 @@ fn simple_success() {
         .insert(client.db.as_ref());
 
     client.acting_as("password", account);
-    let route = format!("/api/admin/accounts/{}", account2.id);
+    let route = format!("/crud/admin/accounts/{}", account2.id);
 
     let status = client.delete(&route).dispatch();
 

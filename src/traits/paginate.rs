@@ -4,11 +4,11 @@ use diesel::query_builder::*;
 use diesel::query_dsl::methods::LoadQuery;
 use diesel::sql_types::BigInt;
 
-pub trait Paginate: Sized {
-    fn paginate(self, page: Option<i64>) -> Paginated<Self>;
+pub trait Paginate<T> {
+    fn paginate(self, page: Option<i64>) -> Paginated<T>;
 }
 
-impl<T: diesel::query_builder::Query> Paginate for T {
+impl<T: diesel::query_builder::Query> Paginate<T> for T {
     fn paginate(self, page: Option<i64>) -> Paginated<Self> {
         Paginated {
             query: self,
@@ -33,7 +33,7 @@ impl<T> Paginated<T> {
         Paginated { per_page, ..self }
     }
 
-    pub fn load_and_count_pages<U, C>(self, conn: &C) -> QueryResult<(Vec<U>, i64, i64, i64)>
+    pub fn load_and_count_pages<U, C>(self, conn: &C) -> QueryResult<(Vec<U>, i64, i64, i64, i64)>
     where
         C: diesel::Connection,
         Self: LoadQuery<C, (U, i64)>,
@@ -44,7 +44,7 @@ impl<T> Paginated<T> {
         let total = results.get(0).map(|x| x.1).unwrap_or(0);
         let records = results.into_iter().map(|x| x.0).collect();
         let total_pages = (total as f64 / per_page as f64).ceil() as i64;
-        Ok((records, total_pages, page, per_page))
+        Ok((records, total, total_pages, page, per_page))
     }
 }
 
