@@ -8,15 +8,12 @@ use diesel::types::HasSqlType;
 use diesel::{PgConnection, Queryable};
 use paginator::Paginator;
 
-use cli_table::{
-    format::{CellFormat, Color, TableFormat},
-    Cell, Row, Table as CliTable,
-};
+use cli_table::{ Cell, Table as CliTable, CellStruct, print_stdout};
 
 /// A generic Command line table that maps to a diesel table row.
 pub trait Table<M>: Default
 where
-    M: HasTable + Into<Vec<Cell>>,
+    M: HasTable + Into<Vec<CellStruct>>,
     M: Queryable<<<M as HasTable>::Table as AsQuery>::SqlType, Pg>,
     Pg: HasSqlType<<<M as HasTable>::Table as AsQuery>::SqlType>,
     <M as HasTable>::Table: QueryId,
@@ -48,11 +45,11 @@ where
             .load_and_count_pages::<M, PgConnection>(&conn)
             .unwrap();
 
-        let mut data: Vec<Vec<Cell>> = data.into_iter().map(|item| item.into()).collect();
+        let mut data: Vec<Vec<CellStruct>> = data.into_iter().map(|item| item.into()).collect();
 
         let headers = Self::HEADERS
             .iter()
-            .map(|item| Cell::new(item, self.header_format()))
+            .map(|item| item.cell())
             .collect();
 
         data.insert(0, headers);
@@ -66,32 +63,15 @@ where
 
             let items = paginator::page_items_to_string(paginator.as_slice());
 
-            let mut page_row_data = vec![Cell::new(&items, Default::default())];
+            let mut page_row_data = vec![items.cell()];
 
             for _ in 0..data[0].len() - 1 {
-                page_row_data.push(Cell::new("", Default::default()));
+                page_row_data.push("".cell());
             }
 
             data.push(page_row_data);
         }
 
-        CliTable::new(
-            data.into_iter().map(Row::new).collect(),
-            Self::table_config(),
-        )
-        .unwrap()
-        .print_stdout()
-        .unwrap();
-    }
-
-    fn header_format(&self) -> CellFormat {
-        CellFormat::builder()
-            .foreground_color(Some(Color::Yellow))
-            .bold(true)
-            .build()
-    }
-
-    fn table_config() -> TableFormat {
-        TableFormat::default().foreground(Color::Red)
+        assert!(print_stdout(data.table()).is_ok());
     }
 }

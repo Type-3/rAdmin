@@ -50,18 +50,18 @@ pub fn rocket_factory(conf: Option<&str>, modules: &Modules) -> Result<Rocket, S
         config = (*module).config(config);
     }
 
-    let mut rocket = rocket::custom(config.clone())
+    let mut server = rocket::custom(config.clone())
         .attach(DbConnection::fairing())
         .manage(config)
         .register(errors::api_errors());
 
     for module in modules.0.iter() {
         for (path, route) in (*module).routes().routes() {
-            rocket = rocket.mount(&format!("/crud/{}", path), route);
+            server = server.mount(&format!("/{}", path), route);
         }
     }
 
-    Ok(rocket)
+    Ok(server)
 }
 
 pub fn run(app: Application) -> Result<(), ServerError> {

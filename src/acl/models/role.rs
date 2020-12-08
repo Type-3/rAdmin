@@ -16,18 +16,18 @@ pub struct Role {
     pub updated_at: DateTime<Utc>,
 }
 
-use cli_table::Cell;
+use cli_table::{CellStruct, Cell};
 
-impl Into<Vec<Cell>> for Role {
-    fn into(self) -> Vec<Cell> {
+impl Into<Vec<CellStruct>> for Role {
+    fn into(self) -> Vec<CellStruct> {
         let label = self.label.unwrap_or_else(|| "None".into());
         let description = self.description.unwrap_or_else(|| "None".into());
         vec![
-            Cell::new(&self.id, Default::default()),
-            Cell::new(&self.name, Default::default()),
-            Cell::new(&self.is_super, Default::default()),
-            Cell::new(&label, Default::default()),
-            Cell::new(&description, Default::default()),
+            self.id.cell(),
+            self.name.cell(),
+            self.is_super.cell(),
+            label.cell(),
+            description.cell()
         ]
     }
 }

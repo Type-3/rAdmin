@@ -36,16 +36,16 @@ impl Account {
     }
 }
 
-use cli_table::Cell;
+use cli_table::{CellStruct, Cell};
 
-impl Into<Vec<Cell>> for Account {
-    fn into(self) -> Vec<Cell> {
+impl Into<Vec<CellStruct>> for Account {
+    fn into(self) -> Vec<CellStruct> {
         vec![
-            Cell::new(&self.id, Default::default()),
-            Cell::new(&self.email, Default::default()),
-            Cell::new(&self.username, Default::default()),
-            Cell::new(&self.created_at, Default::default()),
-            Cell::new(&self.updated_at, Default::default()),
+            self.id.cell(),
+            self.email.cell(),
+            self.username.cell(),
+            self.created_at.cell(),
+            self.updated_at.cell()
         ]
     }
 }
