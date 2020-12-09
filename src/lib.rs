@@ -61,6 +61,10 @@ pub fn rocket_factory(conf: Option<&str>, modules: &Modules) -> Result<Rocket, S
         }
     }
 
+    if cfg!(feature = "tera") || cfg!(feature = "handlebars") {
+        server = server.attach(rocket_contrib::templates::Template::fairing());
+    }
+
     Ok(server)
 }
 
