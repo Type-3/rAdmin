@@ -26,7 +26,7 @@ pub struct AccountRequest {
     )]
     pub password: Option<String>,
     pub password_confirm: Option<String>,
-    pub roles: Vec<Uuid>,
+    pub roles: Vec<String>,
     pub avatar: Option<Uuid>,
 }
 

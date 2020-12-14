@@ -1,6 +1,5 @@
 use clap::{value_t_or_exit, App, AppSettings, Arg, ArgMatches, SubCommand};
 use diesel::{QueryDsl, RunQueryDsl};
-use uuid::Uuid;
 
 use super::tables::RolesTable;
 use crate::acl::factories::RoleFactory;
@@ -86,8 +85,8 @@ fn handle_add_function(matches: &ArgMatches) -> Result<(), ServerError> {
 }
 
 fn handle_rm_function(matches: &ArgMatches) -> Result<(), ServerError> {
-    let id = value_t_or_exit!(matches, "id", Uuid);
+    let id = value_t_or_exit!(matches, "name", String);
     let db = crate::establish_connection().unwrap();
-    diesel::delete(roles::table.find(id)).execute(&db)?;
+    diesel::delete(roles::table.find::<String>(id)).execute(&db)?;
     Ok(())
 }

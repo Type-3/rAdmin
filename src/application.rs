@@ -2,12 +2,15 @@ use clap::{crate_authors, crate_description, crate_name, crate_version};
 
 use crate::modules::ServerModule;
 
+use std::sync::{Arc, Mutex};
+
 pub struct Application {
     pub(crate) name: &'static str,
     pub(crate) version: &'static str,
     pub(crate) author: &'static str,
     pub(crate) description: &'static str,
     pub(crate) modules: crate::modules::Modules,
+    pub(crate) configure: Arc<Mutex<dyn Fn(rocket::Rocket) -> rocket::Rocket>>
 }
 
 impl Default for Application {
@@ -24,6 +27,13 @@ impl Application {
             author: crate_authors!(),
             description: crate_description!(),
             modules: crate::modules::Modules::default(),
+            configure: Arc::new(Mutex::new(|rocket: rocket::Rocket| {
+                if cfg!(feature = "tera") || cfg!(feature = "handlebars") {
+                    rocket.attach(rocket_contrib::templates::Template::fairing())
+                } else {
+                    rocket
+                }
+            }))
         }
     }
 
@@ -59,6 +69,11 @@ impl Application {
 
     pub fn add_module_default<T: ServerModule + Default + 'static>(mut self) -> Application {
         self.modules.add_module_default::<T>();
+        self
+    }
+
+    pub fn configure<F: Fn(rocket::Rocket) -> rocket::Rocket + 'static>(mut self, func: F) -> Application {
+        self.configure = Arc::new(Mutex::new(func));
         self
     }
 }

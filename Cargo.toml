@@ -43,6 +43,3 @@ features = ["uuid", "json", "diesel_postgres_pool", "tera_templates"]
 
 [target.'cfg(feature = "handlebars")'.dependencies.rocket_contrib]
 features = ["uuid", "json", "diesel_postgres_pool", "handlebars_templates"]
-
-[target.'cfg(not(feature = "tera"))'.dependencies.rocket_contrib]
-features = ["uuid", "json", "diesel_postgres_pool"]

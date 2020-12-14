@@ -19,7 +19,7 @@ pub struct AccountFactory {
     pub password_hash: Vec<u8>,
     pub password_salt: Vec<u8>,
     pub avatar: Option<Uuid>,
-    pub roles: Vec<Uuid>,
+    pub roles: Vec<String>,
 }
 
 impl AccountFactory {
@@ -38,7 +38,7 @@ impl AccountFactory {
         self
     }
 
-    pub fn roles(mut self, roles: Vec<Uuid>) -> AccountFactory {
+    pub fn roles(mut self, roles: Vec<String>) -> AccountFactory {
         self.roles = roles;
         self
     }

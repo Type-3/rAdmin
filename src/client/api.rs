@@ -25,7 +25,7 @@ macro_rules! truncate_tables {
 impl ApiClient {
     pub fn new(modules: Option<Modules>) -> Result<ApiClient, crate::ServerError> {
         let modules = modules.unwrap_or_default();
-        let client = Client::new(rocket_factory(Some("testing"), &modules)?)?;
+        let client = Client::new(rocket_factory(Some("testing"), &modules, None)?)?;
         let db = DbClient::new(Some(&modules)).unwrap();
         truncate_tables!(db.as_ref(), accounts, roles);
         Ok(ApiClient {

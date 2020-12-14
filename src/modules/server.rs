@@ -1,5 +1,5 @@
 use super::{
-    CliModule, DatabaseModule, NullCliModule, NullDatabaseModule, NullRoutesModule, RoutesModule,
+    CliModule, DatabaseModule, NullCliModule, NullDatabaseModule, NullRoutesModule, RoutesModule
 };
 
 pub trait ServerModule {

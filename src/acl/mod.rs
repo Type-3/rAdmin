@@ -19,6 +19,8 @@ pub use self::seeder::AclSeeder;
 mod config;
 pub use self::config::AclModuleConfig;
 
+use clap::crate_version;
+
 #[derive(Default)]
 pub struct AclModule {
     config: AclModuleConfig,
@@ -36,7 +38,7 @@ impl crate::modules::ServerModule for AclModule {
     }
 
     fn version(&self) -> &'static str {
-        clap::crate_version!()
+        crate_version!()
     }
 
     fn storage(&self) -> Vec<(&'static str, Vec<&'static str>)> {

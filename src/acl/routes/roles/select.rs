@@ -17,7 +17,7 @@ impl ApiSelect for RoleSelect {
             .into_iter()
             .map(|item: Role| {
                 let text = item.label.unwrap_or(item.name);
-                SelectResult { text, id: item.id }
+                SelectResult { id: text.clone(), text }
             })
             .collect::<Vec<SelectResult>>())
     }

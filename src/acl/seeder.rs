@@ -2,7 +2,7 @@ use crate::modules::Seeder;
 use crate::traits::Submitable;
 use crate::ServerError;
 use clap::{Arg, ArgMatches};
-use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
+use diesel::PgConnection;
 use serde_json::{json, Map, Value};
 use uuid::Uuid;
 
@@ -26,30 +26,8 @@ impl Seeder for AclSeeder {
             }
         }
         if let Ok(file) = File::open("seeds/accounts.json") {
-            use crate::acl::schema::roles;
             let accounts: Vec<Map<String, Value>> = serde_json::from_reader(file)?;
             for mut account in accounts.into_iter() {
-                if account.contains_key("roles") {
-                    account["roles"] = json!(account
-                        .get("roles")
-                        .expect("Json does not contain the `roles` field")
-                        .as_array()
-                        .expect("`roles` field is not JSON array")
-                        .iter()
-                        .map(|item| {
-                            roles::table
-                                .select(roles::id)
-                                .filter(roles::name.eq(item.as_str().unwrap()))
-                                .first::<uuid::Uuid>(conn)
-                                .unwrap_or_else(|_| {
-                                    panic!(
-                                        "Role named `{}` does not exists",
-                                        item.as_str().unwrap()
-                                    )
-                                })
-                        })
-                        .collect::<Vec<uuid::Uuid>>());
-                }
                 account.insert("password_confirm".into(), account["password"].clone());
                 if !account.contains_key("roles") {
                     account.insert("roles".into(), json!(Vec::<Value>::new()));

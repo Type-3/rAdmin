@@ -18,7 +18,6 @@ pub extern crate validator_derive;
 mod application;
 mod database;
 mod error;
-mod errors;
 mod response;
 
 pub mod acl;
@@ -43,7 +42,7 @@ pub use radmin_macros::{from_similar, Role};
 use crate::modules::{CliModule, Modules};
 use rocket::Rocket;
 
-pub fn rocket_factory(conf: Option<&str>, modules: &Modules) -> Result<Rocket, ServerError> {
+pub fn rocket_factory(conf: Option<&str>, modules: &Modules, app: Option<&Application>) -> Result<Rocket, ServerError> {
     let mut config = config::get_rocket_config(conf)?;
 
     for module in modules.0.iter() {
@@ -52,17 +51,22 @@ pub fn rocket_factory(conf: Option<&str>, modules: &Modules) -> Result<Rocket, S
 
     let mut server = rocket::custom(config.clone())
         .attach(DbConnection::fairing())
-        .manage(config)
-        .register(errors::api_errors());
+        .manage(config);
+
+    let mut catchers = vec![];
 
     for module in modules.0.iter() {
-        for (path, route) in (*module).routes().routes() {
+        let routes = module.routes();
+        for (path, route) in routes.routes() {
             server = server.mount(&format!("/{}", path), route);
         }
+        catchers.extend(routes.catch());
     }
+    server = server.register(catchers);
 
-    if cfg!(feature = "tera") || cfg!(feature = "handlebars") {
-        server = server.attach(rocket_contrib::templates::Template::fairing());
+    if let Some(app) = app {
+        let closure = app.configure.lock().unwrap();
+        server = closure(server);
     }
 
     Ok(server)

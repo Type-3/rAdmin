@@ -15,7 +15,7 @@ pub struct AccountCreateForm {
     pub username: String,
     pub password: String,
     pub password_confirm: String,
-    pub roles: Vec<Uuid>,
+    pub roles: Vec<String>,
     pub avatar: Option<Uuid>,
     #[serde(skip)]
     pub pw_type: PasswordType,

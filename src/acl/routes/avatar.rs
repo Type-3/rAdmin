@@ -4,7 +4,7 @@ use crate::acl::guards::AuthorizedAccount;
 use rocket::response::NamedFile;
 use rocket::{Config, State};
 
-#[rocket::get("/<id>?")]
+#[rocket::get("/<id>?", rank=6)]
 pub fn avatar_image(
     _auth: AuthorizedAccount,
     config: State<Config>,

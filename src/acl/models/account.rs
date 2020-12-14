@@ -23,7 +23,7 @@ pub struct Account {
     pub auth_token: Option<String>,
     pub email_verified_at: Option<DateTime<Utc>>,
     pub avatar: Option<Uuid>,
-    pub roles: Vec<Uuid>,
+    pub roles: Vec<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }

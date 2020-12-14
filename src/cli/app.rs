@@ -13,7 +13,7 @@ pub struct CliApp<'a> {
 impl<'a> CliApp<'a> {
     pub fn new(app: &'a crate::Application) -> CliApp<'a> {
         CliApp {
-            app: &app,
+            app: app,
             database: Database::new(&app),
             storage: Storage::new(&app),
         }
@@ -44,7 +44,7 @@ impl<'a> CliModule for CliApp<'a> {
         dotenv::dotenv().unwrap();
         let matches = matches.unwrap();
         if matches.subcommand.is_none() {
-            Err(crate::rocket_factory(None, &self.app.modules)?
+            Err(crate::rocket_factory(None, &self.app.modules, Some(&self.app))?
                 .launch()
                 .into())
         } else {

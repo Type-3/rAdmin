@@ -13,5 +13,5 @@ impl Table<Account> for AccountsTable {
 pub struct RolesTable;
 
 impl Table<Role> for RolesTable {
-    const HEADERS: &'static [&'static str] = &["Id", "Name", "Label", "Roles", "Description"];
+    const HEADERS: &'static [&'static str] = &["Name", "Label", "Roles", "Description"];
 }

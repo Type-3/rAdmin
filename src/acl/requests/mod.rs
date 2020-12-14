@@ -9,8 +9,9 @@ use typed_builder::TypedBuilder;
 use validator::Validate;
 use validator::ValidationErrors;
 use validator_derive::Validate;
+use rocket::request::FromForm;
 
-#[derive(Debug, TypedBuilder, PartialEq, Clone, Serialize, Deserialize, Validate)]
+#[derive(Debug, TypedBuilder, PartialEq, Clone, Serialize, Deserialize, Validate, FromForm)]
 pub struct LoginRequest {
     #[builder(setter(into))]
     #[validate(length(min = 4))]
@@ -28,7 +29,7 @@ impl LoginRequest {
     }
 }
 
-#[derive(Debug, TypedBuilder, PartialEq, Clone, Serialize, Deserialize, Validate)]
+#[derive(Debug, TypedBuilder, PartialEq, Clone, Serialize, Deserialize, Validate, FromForm)]
 pub struct RegisterRequest {
     #[builder(setter(into))]
     pub email: String,

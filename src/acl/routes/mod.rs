@@ -18,7 +18,8 @@ impl AclRoutesMod {
 impl RoutesModule for AclRoutesMod {
     fn routes(&self) -> Vec<(String, Vec<rocket::Route>)> {
         let mut routes = vec![
-            ("auth".into(), auth::api_routes(&self.0)),
+            ("api/auth".into(), auth::api_routes(&self.0)),
+            ("auth".into(), auth::form_routes(&self.0)),
             ("avatars".into(), rocket::routes![avatar::avatar_image]),
         ];
         if let Some(route) = &self.0.enable_crud {
