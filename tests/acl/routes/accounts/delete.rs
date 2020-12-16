@@ -10,7 +10,7 @@ use radmin::modules::Modules;
 
 #[test]
 fn simple_success() {
-    let acl_config = AclModuleConfig::default().set_enable_crud("admin/");
+    let acl_config = AclModuleConfig::default().set_enable_crud_routes("admin/");
     let mut modules = Modules::new();
     modules.add_module(AclModule::new(acl_config));
     let mut client = ApiClient::new(Some(modules)).expect("Failed to build test client");

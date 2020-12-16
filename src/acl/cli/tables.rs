@@ -6,7 +6,7 @@ pub struct AccountsTable;
 
 impl Table<Account> for AccountsTable {
     const HEADERS: &'static [&'static str] =
-        &["Id", "Email", "Username", "Created At", "Updated At"];
+        &["Id", "Email", "Username", "Roles", "Created At", "Updated At"];
 }
 
 #[derive(Default)]

@@ -1,5 +1,6 @@
 use crate::modules::CliModule;
 use crate::ServerError;
+use termion::{color, style};
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 pub struct Database<'a>(&'a crate::Application);
@@ -59,8 +60,18 @@ impl<'a> Database<'a> {
         if reset {
             self.handle_reset_command(None)?;
         }
-        crate::database::migrate_with_output(&conn, &mut std::io::stdout())?;
+        crate::database::migrate(&conn)?;
+        println!("{}Running database migration's{}", color::Fg(color::Green), style::Reset);
         for module in &self.0.modules.0 {
+            println!(
+                "    {}->{} {}{}({}){}",
+                color::Fg(color::Blue),
+                style::Reset,
+                style::Italic,
+                module.identifier(),
+                module.version(),
+                style::Reset
+            );
             (*module).database().run_migrations(&conn)?;
         }
         if seed {
@@ -78,16 +89,30 @@ impl<'a> Database<'a> {
 
     fn handle_seed_command(&self, matches: Option<&ArgMatches>) -> Result<(), ServerError> {
         let conn = crate::database::establish_connection()?;
+        println!("{}Running database seeder's{}", color::Fg(color::Green), style::Reset);
         for module in &self.0.modules.0 {
             println!(
-                "Running {}({}) seeder",
+                "    {}->{} {}{}({}){}",
+                color::Fg(color::Blue),
+                style::Reset,
+                style::Italic,
                 module.identifier(),
-                module.version()
+                module.version(),
+                style::Reset
             );
             match (*module).database().seeder().seed(matches, &conn) {
                 Ok(_) => {}
                 Err(err) => {
-                    println!("{}({}): {:?}", module.identifier(), module.version(), err);
+                    println!(
+                        "{}{}({}){}: {}{:?}{}",
+                        color::Fg(color::Red),
+                        module.identifier(),
+                        module.version(),
+                        style::Reset,
+                        style::Italic,
+                        err,
+                        style::Reset
+                    );
                 }
             }
         }

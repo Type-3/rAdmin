@@ -13,3 +13,7 @@ pub fn api_routes() -> Vec<rocket::Route> {
     routes.push(table::AccountsTable::route());
     routes
 }
+
+pub fn form_routes() -> Vec<rocket::Route> {
+    rocket::routes![delete::form_delete]
+}

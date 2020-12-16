@@ -17,7 +17,7 @@ pub fn api_routes(config: &AclModuleConfig) -> Vec<rocket::Route> {
 }
 
 pub fn form_routes(config: &AclModuleConfig) -> Vec<rocket::Route> {
-    if config.enable_form_routes {
+    if config.enable_form_routes.is_some() {
         if config.enable_register_route {
             rocket::routes![login::form_login, logout::logout, register::form_register]
         } else {

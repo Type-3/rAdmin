@@ -44,6 +44,7 @@ impl Into<Vec<CellStruct>> for Account {
             self.id.cell(),
             self.email.cell(),
             self.username.cell(),
+            self.roles.join(" ").cell(),
             self.created_at.cell(),
             self.updated_at.cell()
         ]

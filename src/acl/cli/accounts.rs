@@ -1,6 +1,7 @@
-use clap::{value_t_or_exit, App, AppSettings, Arg, ArgMatches, SubCommand};
-use diesel::{QueryDsl, RunQueryDsl};
 use uuid::Uuid;
+use termion::{color, style};
+use diesel::{QueryDsl, RunQueryDsl};
+use clap::{value_t_or_exit, App, AppSettings, Arg, ArgMatches, SubCommand};
 
 use super::tables::AccountsTable;
 use crate::acl::factories::AccountFactory;
@@ -82,7 +83,14 @@ fn handle_add_command(matches: &ArgMatches) -> Result<(), ServerError> {
         None => PasswordType::Argon2,
         Some("argon2") => PasswordType::Argon2,
         Some("bcrypt") => PasswordType::Bcrypt,
-        Some(_) => panic!("Invalid password hash type"),
+        Some(ty) => panic!(
+            "{}Invalid password type{}: {}{:?}{}",
+            color::Fg(color::Red),
+            style::Reset,
+            style::Italic,
+            ty,
+            style::Reset
+        ),
     };
     let db = crate::establish_connection().unwrap();
     AccountFactory::default()

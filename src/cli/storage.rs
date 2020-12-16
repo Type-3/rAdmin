@@ -1,5 +1,6 @@
 use crate::modules::CliModule;
 use crate::ServerError;
+use termion::{color, style};
 use clap::{App, AppSettings, ArgMatches, SubCommand};
 
 pub struct Storage<'a>(&'a crate::Application);
@@ -61,12 +62,49 @@ impl<'a> Storage<'a> {
 
     fn handle_info_command(&self, _: Option<&ArgMatches>) -> Result<(), ServerError> {
         let data_path = std::env::var("STORAGE_PATH").unwrap_or_else(|_| "data".into());
-        println!("Storage Path: {}", data_path);
+        println!(
+            "{}{}Storage Path{}: {}",
+            color::Fg(color::Green),
+            style::Italic,
+            style::Reset,
+            data_path
+        );
         for module in &self.0.modules.0 {
-            println!("{}({})", module.identifier(), module.version());
+            let paths = module.storage();
+            if paths.len() > 0 {
+                println!(
+                    "    {}{}({}){}",
+                    color::Fg(color::Green),
+                    module.identifier(),
+                    module.version(),
+                    color::Fg(color::Reset)
+                );
+            }
             for (path, extension) in module.storage() {
-                println!("    Path: {}", path);
-                println!("    Extensions: {:?}", extension);
+                println!(
+                    "        {}->{} {}{}Path{}{}: {}{}{}",
+                    color::Fg(color::Blue),
+                    color::Fg(color::Reset),
+                    style::Italic,
+                    color::Fg(color::Magenta),
+                    style::Reset,
+                    color::Fg(color::Reset),
+                    color::Fg(color::Cyan),
+                    path,
+                    color::Fg(color::Reset)
+                );
+                println!(
+                    "        {}->{} {}{}Extensions{}: {}{:?}{}{}",
+                    color::Fg(color::Blue),
+                    color::Fg(color::Reset),
+                    style::Italic,
+                    color::Fg(color::Magenta),
+                    color::Fg(color::Reset),
+                    color::Fg(color::Cyan),
+                    extension,
+                    color::Fg(color::Reset),
+                    style::Reset,
+                );
             }
         }
         Ok(())

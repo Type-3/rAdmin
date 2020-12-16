@@ -22,9 +22,13 @@ impl RoutesModule for AclRoutesMod {
             ("auth".into(), auth::form_routes(&self.0)),
             ("avatars".into(), rocket::routes![avatar::avatar_image]),
         ];
-        if let Some(route) = &self.0.enable_crud {
+        if let Some(route) = &self.0.enable_crud_routes {
             routes.push((format!("{}roles", route), roles::api_routes()));
             routes.push((format!("{}accounts", route), accounts::api_routes()));
+        }
+        if let Some(route) = &self.0.enable_form_routes {
+            routes.push((format!("{}accounts", route), accounts::form_routes()));
+            routes.push((format!("{}roles", route), roles::form_routes()));
         }
         routes
     }

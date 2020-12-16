@@ -31,6 +31,8 @@ pub mod modules;
 pub mod roles;
 pub mod traits;
 pub mod types;
+#[cfg(any(feature = "tera", feature = "handlebars"))]
+pub mod template_helpers;
 
 pub use self::application::Application;
 pub use self::database::{establish_connection, DbConnection};

@@ -29,7 +29,11 @@ impl Application {
             modules: crate::modules::Modules::default(),
             configure: Arc::new(Mutex::new(|rocket: rocket::Rocket| {
                 if cfg!(feature = "tera") || cfg!(feature = "handlebars") {
-                    rocket.attach(rocket_contrib::templates::Template::fairing())
+                    rocket.attach(rocket_contrib::templates::Template::custom(|engines| {
+                        if cfg!(feature = "tera") {
+                            engines.tera.register_filter("avatar", crate::template_helpers::tera::avatar);
+                        }
+                    }))
                 } else {
                     rocket
                 }
